@@ -193,14 +193,18 @@ public class XPInTheJar extends JavaPlugin implements Listener {
 				bank.setZ(bankBlock.getZ());
 				bank.setWorldName(bankBlock.getWorld().getName());
 				bank.setXp(0);
-				XPInTheJar.instance.getDatabase().save(bank);
+				return bank;
 			}
+			
+			return null;
 		}
 		
 		return bank;
 	 }
 	 
 	 public void updateSigns(Block bankBlock, Bank bank) {
+		 
+		 if (bank == null || bankBlock == null) return;
 		 
 		 BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
 		 

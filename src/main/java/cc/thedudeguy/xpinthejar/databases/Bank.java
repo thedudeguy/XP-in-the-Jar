@@ -8,7 +8,7 @@ import com.avaje.ebean.validation.NotEmpty;
 import com.avaje.ebean.validation.NotNull;
 
 @Entity()
-@Table(name="blockxp")
+@Table(name="xp_bank")
 public class Bank {
 
 	@Id
