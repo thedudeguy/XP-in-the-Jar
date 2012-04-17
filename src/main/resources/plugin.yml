@@ -1,8 +1,6 @@
-name: XPout
-main: cc.thedudeguy.xpout.XPout
+name: XP In The Jar
+main: cc.thedudeguy.xpinthejar.XPInTheJar
 version: 1.0.0
-description: Store you xp in a block.
+description: Musha ring dum-a do dum-a da. There's XP in the jar-o. Store XP in a container block.
 author: Chris Churchwell (thedudeguy)
-website: http://dev.bukkit.org/server-mods/xpout/
-softdepend: [Spout]
 database: true

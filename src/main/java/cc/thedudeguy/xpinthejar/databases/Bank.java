@@ -1,4 +1,4 @@
-package cc.thedudeguy.xpout.databases;
+package cc.thedudeguy.xpinthejar.databases;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

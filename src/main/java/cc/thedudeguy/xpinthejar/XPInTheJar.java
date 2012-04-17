@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
-package cc.thedudeguy.xpout;
+package cc.thedudeguy.xpinthejar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +35,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import cc.thedudeguy.xpout.databases.Bank;
+import cc.thedudeguy.xpinthejar.databases.Bank;
 
-public class XPout extends JavaPlugin implements Listener {
+public class XPInTheJar extends JavaPlugin implements Listener {
 	
-	public static XPout instance;
+	public static XPInTheJar instance;
 	
 	public static final int transferAmount = 100;
 	
@@ -53,19 +53,19 @@ public class XPout extends JavaPlugin implements Listener {
 		//register events
 		this.getServer().getPluginManager().registerEvents(this, this);
 		
-		Bukkit.getLogger().log(Level.INFO, "[XPout] Enabled.");
+		Bukkit.getLogger().log(Level.INFO, "[XP in the Jar] Enabled.");
 	}
 	
 	public void onDisable()
 	{
-		Bukkit.getLogger().log(Level.INFO, "[XPout] Disabled.");
+		Bukkit.getLogger().log(Level.INFO, "[XP in the Jar] Disabled.");
 	}
 	
 	private void setupDatabase() {
 		try {
             getDatabase().find(Bank.class).findRowCount();
         } catch (PersistenceException ex) {
-            Bukkit.getLogger().log(Level.INFO, "[XPout] Installing database for " + getDescription().getName() + " due to first time usage");
+            Bukkit.getLogger().log(Level.INFO, "[XP in the Jar] Installing database for " + getDescription().getName() + " due to first time usage");
             installDDL();
         }
 	}
@@ -89,7 +89,7 @@ public class XPout extends JavaPlugin implements Listener {
 			addPlayerExp(player, bank.getXp());
 			player.sendMessage("Retrieved " + String.valueOf(bank.getXp()) + "xp");
 			bank.setXp(0);
-			XPout.instance.getDatabase().save(bank);
+			XPInTheJar.instance.getDatabase().save(bank);
 			
 		 }
 	 }
@@ -122,7 +122,7 @@ public class XPout extends JavaPlugin implements Listener {
 					 player.sendMessage("Transferred " + String.valueOf(transferAmount) + "xp to Bank");
 				 }
 				 
-				 XPout.instance.getDatabase().save(bank);
+				 XPInTheJar.instance.getDatabase().save(bank);
 				 updateSigns(bankBlock, bank);
 				 return;
 				 
@@ -145,7 +145,7 @@ public class XPout extends JavaPlugin implements Listener {
 					 player.sendMessage("Withdrew " + String.valueOf(transferAmount) + "xp from Bank");
 				 }
 				 
-				 XPout.instance.getDatabase().save(bank);
+				 XPInTheJar.instance.getDatabase().save(bank);
 				 updateSigns(bankBlock, bank);
 				 return;
 			 }
@@ -177,7 +177,7 @@ public class XPout extends JavaPlugin implements Listener {
 	 
 	 public Bank getBank(Block bankBlock, boolean createIfNone) {
 		 
-		Bank bank = XPout.instance.getDatabase().find(Bank.class)
+		Bank bank = XPInTheJar.instance.getDatabase().find(Bank.class)
 				.where()
 					.eq("x", bankBlock.getX())
 					.eq("y", bankBlock.getY())
@@ -193,7 +193,7 @@ public class XPout extends JavaPlugin implements Listener {
 				bank.setZ(bankBlock.getZ());
 				bank.setWorldName(bankBlock.getWorld().getName());
 				bank.setXp(0);
-				XPout.instance.getDatabase().save(bank);
+				XPInTheJar.instance.getDatabase().save(bank);
 			}
 		}
 		
