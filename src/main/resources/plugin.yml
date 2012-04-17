@@ -1,0 +1,8 @@
+name: XPout
+main: cc.thedudeguy.xpout.XPout
+version: 1.0.0
+description: Store you xp in a block.
+author: Chris Churchwell (thedudeguy)
+website: http://dev.bukkit.org/server-mods/xpout/
+softdepend: [Spout]
+database: true
