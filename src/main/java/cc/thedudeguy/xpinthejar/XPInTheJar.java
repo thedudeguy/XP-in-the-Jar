@@ -32,6 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -40,8 +41,6 @@ import cc.thedudeguy.xpinthejar.databases.Bank;
 public class XPInTheJar extends JavaPlugin implements Listener {
 	
 	public static XPInTheJar instance;
-	
-	public static final int transferAmount = 100;
 	
 	public void onEnable()
 	{
@@ -76,7 +75,7 @@ public class XPInTheJar extends JavaPlugin implements Listener {
 	    list.add(Bank.class);
 	    return list;
 	}
-	 
+		
 	@EventHandler
 	public void onBlockDestoy(BlockBreakEvent event) {
 		if (event.getBlock().getType().equals(Material.DIAMOND_BLOCK)) {
@@ -111,15 +110,33 @@ public class XPInTheJar extends JavaPlugin implements Listener {
 				 
 				 if (bank==null || player.getTotalExperience() < 1) return;
 				 
-				 if (player.getTotalExperience() < transferAmount) {
-					 int amount = player.getTotalExperience();
-					 bank.add(amount);
-					 setPlayerExp(player, 0);
-					 player.sendMessage("Transferred " + String.valueOf(amount) + "xp to Bank");
+				 /*
+				 if getExp() is 0, than the player is exactly at a level
+				 in which we can sequencially remove levels with precision.
+				 otherwise, a partial level has been obtained, and we will go ahead and deposit that
+				 partial amount. If a player has no exp, and is level 0, this part of the
+				 code cannot be reached since it will have already returned, so we dont have to worry
+				 about taking more than possible.
+				 */
+				 if ( player.getExp() == 0 )
+				 {
+					 //here the player is at an exact level, so we can start subtracting exp
+					 //by the level
+					 int toDeposit = player.getTotalExperience() - (calculateLevelToExp(player.getLevel()-1));
+					 bank.add(toDeposit);
+					 player.setTotalExperience(player.getTotalExperience()-toDeposit);
+					 player.setLevel(player.getLevel()-1);
+					 player.setExp(0);
+					 player.sendMessage("Deposited " + String.valueOf(toDeposit) + "xp to Bank");
 				 } else {
-					 bank.add(transferAmount);
-					 setPlayerExp(player, player.getTotalExperience() - transferAmount);
-					 player.sendMessage("Transferred " + String.valueOf(transferAmount) + "xp to Bank");
+					 
+					 //calculate how much xp into the level they have, and thats what will be deposited
+					 int toDeposit = player.getTotalExperience() - (calculateLevelToExp(player.getLevel()));
+					 bank.add(toDeposit);
+					 player.setTotalExperience(calculateLevelToExp(player.getLevel()));
+					 player.setLevel(player.getLevel());
+					 player.setExp(0);
+					 player.sendMessage("Deposited " + String.valueOf(toDeposit) + "xp to Bank");
 				 }
 				 
 				 XPInTheJar.instance.getDatabase().save(bank);
@@ -134,15 +151,19 @@ public class XPInTheJar extends JavaPlugin implements Listener {
 				 
 				 if (bank == null || bank.getXp() < 1) return;
 				 
-				 if (bank.getXp() < transferAmount) {
-					 int amount = bank.getXp();
-					 bank.deduct(amount);
-					 addPlayerExp(player, amount);
-					 player.sendMessage("Withdrew " + String.valueOf(amount) + "xp from Bank");
+				 //we will set the toWithdrawel to be what is required for the player to level up.
+				 int toWithdraw = calculateLevelToExp(player.getLevel()+1) - player.getTotalExperience();
+				 player.sendMessage("Required XP to level: " + String.valueOf(toWithdraw));
+				 
+				 if (bank.getXp() < toWithdraw) {
+					 toWithdraw = bank.getXp();
+					 bank.deduct(toWithdraw);
+					 player.giveExp(toWithdraw);
+					 player.sendMessage("Withdrew " + String.valueOf(toWithdraw) + "xp from Bank");
 				 } else {
-					 bank.deduct(transferAmount);
-					 addPlayerExp(player, transferAmount);
-					 player.sendMessage("Withdrew " + String.valueOf(transferAmount) + "xp from Bank");
+					 bank.deduct(toWithdraw);
+					 player.giveExp(toWithdraw);
+					 player.sendMessage("Withdrew " + String.valueOf(toWithdraw) + "xp from Bank");
 				 }
 				 
 				 XPInTheJar.instance.getDatabase().save(bank);
@@ -151,6 +172,14 @@ public class XPInTheJar extends JavaPlugin implements Listener {
 			 }
 		 }
 		 
+	 }
+	 
+	 public int calculateLevelToExp(int level) {
+		 return calculateLevelToExp((float)level);
+	 }
+	 
+	 public int calculateLevelToExp(float level) {
+		 return (int)Math.round( (1.75 * (Math.pow(level, 2)) + ( 5 * level ) ));
 	 }
 	 
 	 public void addPlayerExp(Player player, int amount) {
