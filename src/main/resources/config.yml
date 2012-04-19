@@ -1,0 +1,11 @@
+enableSpout: true
+enableExpBank: true
+enableXPBottles: true
+bottleRequireCrouch: true
+consumeBottleOnDeposit: false
+consumeBottleOnUse: false
+debug: false
+#bankMaxExp: 0
+#bankBlockId: 57
+#depositBlockId: 118
+#bottleMaxExp: 0

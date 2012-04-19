@@ -1,7 +1,32 @@
 name: XP In The Jar
 main: cc.thedudeguy.xpinthejar.XPInTheJar
-version: 1.1.0
+version: 1.2.0
 description: Musha ring dum-a do dum-a da. There's XP in the jar-o. Store XP in a container block.
 website: http://dev.bukkit.org/server-mods/xp-jar/
 author: Chris Churchwell (thedudeguy)
 database: true
+softdepend: [Spout]
+commands:
+  xpinthejar:
+    description: Main Command
+    aliases: xpjar
+    usage: Use "/xpjar help" for more information
+permissions:
+  xpjar.bank.deposit:
+    description: Allows a player to deposit XP
+    default: true
+  xpjar.bank.withdraw:
+    description: Allows a player to withdraw XP
+    default: true
+  xpjar.bank.depositeBottle:
+    description: Allows a player to deposit XP into a bank from a bottle
+    default: true
+  xpjar.bottle.collect:
+    description: Allows a player to gather XP into a bottle
+    default: true
+  xpjar.bottle.use:
+    description: Allows a player to absorb the XP in a bottle
+    default: true
+  xpjar.command.debug: 
+    description: Allows a player to toggle debug mode
+    default: op
