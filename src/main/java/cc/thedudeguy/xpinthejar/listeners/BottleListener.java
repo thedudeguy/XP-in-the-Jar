@@ -76,10 +76,6 @@ public class BottleListener implements Listener {
 	@EventHandler
 	public void onBottleExp(PlayerExpChangeEvent event) {
 		
-		if (event.getPlayer().getItemInHand().getType().equals(Material.POTION)) {
-			event.getPlayer().getItemInHand().setDurability((short)(event.getPlayer().getItemInHand().getDurability()+1));
-		}
-		
 		Debug.debug(event.getPlayer(), "Xp Pickup");
 		Debug.debug(event.getPlayer(), "Amount: ", event.getAmount());
 		
