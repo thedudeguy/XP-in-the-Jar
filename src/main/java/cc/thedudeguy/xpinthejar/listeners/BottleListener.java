@@ -25,20 +25,17 @@ public class BottleListener implements Listener {
     public void OnClickXpBottle(InventoryClickEvent event) {
         ItemStack item = event.getCurrentItem();
 
-        if (
-                item != null &&
-                item.getType().equals(Material.GLASS_BOTTLE) &&
-                XPInTheJar.getXpStored(item) > 0 &&
-                event.getWhoClicked() instanceof Player) {
+        if(item == null || !item.getType().equals(Material.GLASS_BOTTLE) || XPInTheJar.getXpStored(item) <= 0 || !(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
 
-            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getWhoClicked()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer) event.getWhoClicked()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
-            } else {
-                Player player = (Player) event.getWhoClicked();
-                player.sendMessage(" ");
-                player.sendMessage("-- Exp Bottle --");
-                player.sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
-            }
+        if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getWhoClicked()).isSpoutCraftEnabled()) {
+            ((SpoutPlayer) event.getWhoClicked()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
+        } else {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage(" ");
+            player.sendMessage("-- Exp Bottle --");
+            player.sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
         }
     }
 
