@@ -101,33 +101,31 @@ public class BottleListener implements Listener {
      */
      @EventHandler
      public void onBlockInteract(PlayerInteractEvent event) {
+         if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+             return;
+         }
+
          ItemStack item = event.getItem();
+         if(item == null || !item.getType().equals(Material.GLASS_BOTTLE) || XPInTheJar.getXpStored(item) <= 0 || event.isCancelled()) {
+             return;
+         }
+         if (item.getAmount() != 1) {
+             event.getPlayer().sendMessage("You are holding too many XP Bottles, try holding just one");
+             return;
+         }
 
-         if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+         event.getPlayer().giveExp(XPInTheJar.getXpStored(item));
 
-            /*
-            maybe theres an xp bottle in hand and
-            a player wants to consume it
-            */
-            if (item != null && item.getType().equals(Material.GLASS_BOTTLE) && XPInTheJar.getXpStored(item) > 0 && !event.isCancelled()) {
-                if (item.getAmount() != 1) {
-                    event.getPlayer().sendMessage("You are holding too many XP Bottles, try holding just one");
-                } else {
-                    event.getPlayer().giveExp(XPInTheJar.getXpStored(item));
+         if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
+             ((SpoutPlayer) event.getPlayer()).sendNotification( "Exp Bottle Emptied", XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
+         } else {
+             event.getPlayer().sendMessage(XPInTheJar.getXpStored(item) + "xp emptied into your gut-hole");
+         }
 
-                    if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                        ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Bottle Emptied", XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
-                    } else {
-                        event.getPlayer().sendMessage(XPInTheJar.getXpStored(item) + "xp emptied into your gut-hole");
-                    }
-
-                    if (XPInTheJar.instance.getConfig().getBoolean("consumeBottleOnUse")) {
-                        event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
-                    } else {
-                        XPInTheJar.setXpStored(item, 0);
-                    }
-                }
-            }
-        }
-    }
+         if (XPInTheJar.instance.getConfig().getBoolean("consumeBottleOnUse")) {
+             event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
+         } else {
+             XPInTheJar.setXpStored(item, 0);
+         }
+     }
 }
