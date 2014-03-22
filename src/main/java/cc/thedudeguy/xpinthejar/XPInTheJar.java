@@ -175,7 +175,7 @@ public class XPInTheJar extends JavaPlugin {
 
     @Override
     public List<Class<?>> getDatabaseClasses() {
-        List<Class<?>> list = new ArrayList<Class<?>>();
+        List<Class<?>> list = new ArrayList<>();
         list.add(Bank.class);
         return list;
     }
