@@ -227,7 +227,7 @@ public class BankListener implements Listener {
     }
 
     public void updateSigns(Block bankBlock, Bank bank) {
-        if (bank == null || bankBlock == null) {
+        if (bankBlock == null) {
             return;
         }
         BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
@@ -236,8 +236,8 @@ public class BankListener implements Listener {
             if (relBlock.getType().equals(Material.SIGN) || relBlock.getType().equals(Material.SIGN_POST) || relBlock.getType().equals(Material.WALL_SIGN)) {
                 Sign sign = (Sign)relBlock.getState();
                 sign.setLine(0, "");
-                sign.setLine(1, "XP Bank");
-                sign.setLine(2, String.valueOf(bank.getXp()));
+                sign.setLine(1, bank == null ? "" : "XP Bank");
+                sign.setLine(2, bank == null ? "" : String.valueOf(bank.getXp()));
                 sign.setLine(3, "");
                 sign.update(true);
             }
