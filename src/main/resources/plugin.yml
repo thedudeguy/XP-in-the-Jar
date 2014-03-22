@@ -27,6 +27,6 @@ permissions:
   xpjar.bottle.use:
     description: Allows a player to absorb the XP in a bottle
     default: true
-  xpjar.command.debug: 
+  xpjar.command.debug:
     description: Allows a player to toggle debug mode
     default: op
