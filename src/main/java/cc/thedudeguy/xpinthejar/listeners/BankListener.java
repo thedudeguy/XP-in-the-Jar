@@ -48,8 +48,6 @@ public class BankListener implements Listener {
 
             if (bank == null || bank.getXp() < 1) return;
 
-
-
             if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
                 ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Bank Destroyed", "Retrieved " + String.valueOf(bank.getXp()) + "xp", Material.GLASS_BOTTLE);
             } else {
@@ -59,7 +57,6 @@ public class BankListener implements Listener {
             player.giveExp(bank.getXp());
             bank.setXp(0);
             XPInTheJar.instance.getDatabase().save(bank);
-
          }
      }
 
@@ -69,9 +66,9 @@ public class BankListener implements Listener {
      */
      @EventHandler
      public void onBlockInteract(PlayerInteractEvent event) {
+         ItemStack item = event.getPlayer().getItemInHand();
 
          if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-
              /*
               * If we are interacting with a cauldron, we want to deposit xp
               */
@@ -89,28 +86,24 @@ public class BankListener implements Listener {
 
                  //if we have a bottle than we should empty the contents
                  //of the bottle into the cauldron.
-                 if (
-                        player.getItemInHand() != null &&
-                        player.getItemInHand().getType().equals(Material.GLASS_BOTTLE) &&
-                        player.getItemInHand().getDurability() > 0
-                        ) {
-                    if (player.getItemInHand().getAmount() > 1) {
+                 if (item != null && item.getType().equals(Material.GLASS_BOTTLE) && XPInTheJar.getXpStored(item) > 0) {
+                    if (item.getAmount() > 1) {
                         player.sendMessage("You are holding too many bottles, try holding just one");
                         return;
                     }
-                    int toDeposit = player.getItemInHand().getDurability();
+                    int toDeposit = XPInTheJar.getXpStored(item);
                     bank.add(toDeposit);
 
                     if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                        ((SpoutPlayer)event.getPlayer()).sendNotification( "Bottle Deposited", String.valueOf(toDeposit) + "xp", Material.GLASS_BOTTLE);
+                        ((SpoutPlayer)event.getPlayer()).sendNotification( "Bottle Deposited", toDeposit + "xp", Material.GLASS_BOTTLE);
                     } else {
-                        player.sendMessage("Deposited Bottle:" + String.valueOf(toDeposit) + "xp");
+                        player.sendMessage("Deposited Bottle:" + toDeposit + "xp");
                     }
 
                     if (XPInTheJar.instance.getConfig().getBoolean("consumeBottleOnDeposit")) {
                         player.setItemInHand(new ItemStack(Material.AIR));
                     } else {
-                        player.getItemInHand().setDurability((short)0);
+                        XPInTheJar.setXpStored(item, 0);
                     }
                 }
 

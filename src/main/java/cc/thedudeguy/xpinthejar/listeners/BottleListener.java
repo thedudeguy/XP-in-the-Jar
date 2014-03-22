@@ -23,23 +23,23 @@ public class BottleListener implements Listener {
      */
     @EventHandler
     public void OnClickXpBottle(InventoryClickEvent event) {
+        ItemStack item = event.getCurrentItem();
 
         if (
-                event.getCurrentItem() != null &&
-                event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE) &&
-                event.getCurrentItem().getDurability() > 0 &&
+                item != null &&
+                item.getType().equals(Material.GLASS_BOTTLE) &&
+                XPInTheJar.getXpStored(item) > 0 &&
                 event.getWhoClicked() instanceof Player) {
 
             if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getWhoClicked()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getWhoClicked()).sendNotification("Exp Bottle", "Total: " + String.valueOf(event.getCurrentItem().getDurability()) + "xp", Material.GLASS_BOTTLE);
+                ((SpoutPlayer) event.getWhoClicked()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
             } else {
-                Player player = (Player)event.getWhoClicked();
+                Player player = (Player) event.getWhoClicked();
                 player.sendMessage(" ");
                 player.sendMessage("-- Exp Bottle --");
-                player.sendMessage("-- Total: " + String.valueOf(event.getCurrentItem().getDurability()) + "xp");
+                player.sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
             }
         }
-
     }
 
     /**
@@ -48,18 +48,16 @@ public class BottleListener implements Listener {
      */
     @EventHandler
     public void OnHoldXpBottle(PlayerItemHeldEvent event) {
-        if (
-                event.getPlayer().getInventory().getItem(event.getNewSlot()) != null &&
-                event.getPlayer().getInventory().getItem(event.getNewSlot()).getType().equals(Material.GLASS_BOTTLE) &&
-                event.getPlayer().getInventory().getItem(event.getNewSlot()).getDurability() > 0
-                ) {
+        ItemStack item = event.getPlayer().getInventory().getItem(event.getNewSlot());
+
+        if (item != null && item.getType().equals(Material.GLASS_BOTTLE) && XPInTheJar.getXpStored(item) > 0) {
 
             if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification("Exp Bottle", "Total: " + String.valueOf(event.getPlayer().getInventory().getItem(event.getNewSlot()).getDurability()) + "xp", Material.GLASS_BOTTLE);
+                ((SpoutPlayer)event.getPlayer()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
             } else {
                 event.getPlayer().sendMessage(" ");
                 event.getPlayer().sendMessage("-- Exp Bottle --");
-                event.getPlayer().sendMessage("-- Total: " + String.valueOf(event.getPlayer().getInventory().getItem(event.getNewSlot()).getDurability()) + "xp");
+                event.getPlayer().sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
             }
         }
     }
@@ -71,31 +69,30 @@ public class BottleListener implements Listener {
      */
     @EventHandler
     public void onBottleExp(PlayerExpChangeEvent event) {
-
         Debug.debug(event.getPlayer(), "Xp Pickup");
         Debug.debug(event.getPlayer(), "Amount: ", event.getAmount());
 
-        if (event.getPlayer().getItemInHand().getType().equals(Material.GLASS_BOTTLE)) {
+        ItemStack item = event.getPlayer().getItemInHand();
 
-            if (XPInTheJar.instance.getConfig().getBoolean("bottleRequireCrouch") && !event.getPlayer().isSneaking()) return;
+        if (!item.getType().equals(Material.GLASS_BOTTLE)) {
+            return;
+        }
+        if (XPInTheJar.instance.getConfig().getBoolean("bottleRequireCrouch") && !event.getPlayer().isSneaking()) return;
 
-            if ( event.getPlayer().getItemInHand().getAmount() > 1 ) {
-                event.getPlayer().sendMessage("Your holding too many bottles to collect XP, try holding just one.");
-                return;
-            }
-
-            event.getPlayer().getItemInHand().setDurability((short)(event.getPlayer().getItemInHand().getDurability() + event.getAmount()));
-
-            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification( String.valueOf(event.getAmount()) + "xp Collected", String.valueOf(event.getPlayer().getItemInHand().getDurability()) + "xp", Material.GLASS_BOTTLE);
-            } else {
-                event.getPlayer().sendMessage("Collected " + String.valueOf(event.getAmount()) + "xp for a total of " + event.getPlayer().getItemInHand().getDurability());
-            }
-
-            event.setAmount(0);
-
+        if (item.getAmount() > 1) {
+            event.getPlayer().sendMessage("Your holding too many bottles to collect XP, try holding just one.");
+            return;
         }
 
+        XPInTheJar.setXpStored(item, XPInTheJar.getXpStored(item) + event.getAmount());
+
+        if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
+            ((SpoutPlayer)event.getPlayer()).sendNotification(event.getAmount() + "xp Collected", XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
+        } else {
+            event.getPlayer().sendMessage("Collected " + event.getAmount() + " xp for a total of " + XPInTheJar.getXpStored(item));
+        }
+
+        event.setAmount(0);
     }
 
     /**
@@ -104,6 +101,7 @@ public class BottleListener implements Listener {
      */
      @EventHandler
      public void onBlockInteract(PlayerInteractEvent event) {
+         ItemStack item = event.getItem();
 
          if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 
@@ -111,27 +109,22 @@ public class BottleListener implements Listener {
             maybe theres an xp bottle in hand and
             a player wants to consume it
             */
-            if (
-                    event.getItem() != null &&
-                    event.getItem().getType().equals(Material.GLASS_BOTTLE) &&
-                    event.getItem().getDurability() > 0 &&
-                    !event.isCancelled()
-                    ) {
-                if (event.getItem().getAmount() > 1) {
+            if (item != null && item.getType().equals(Material.GLASS_BOTTLE) && XPInTheJar.getXpStored(item) > 0 && !event.isCancelled()) {
+                if (item.getAmount() != 1) {
                     event.getPlayer().sendMessage("You are holding too many XP Bottles, try holding just one");
                 } else {
-                    event.getPlayer().giveExp(event.getItem().getDurability());
+                    event.getPlayer().giveExp(XPInTheJar.getXpStored(item));
 
                     if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                        ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Bottle Emptied", String.valueOf(event.getItem().getDurability()) + "xp", Material.GLASS_BOTTLE);
+                        ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Bottle Emptied", XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
                     } else {
-                        event.getPlayer().sendMessage(String.valueOf(event.getItem().getDurability())+"xp emptied into your gut-hole");
+                        event.getPlayer().sendMessage(XPInTheJar.getXpStored(item) + "xp emptied into your gut-hole");
                     }
 
                     if (XPInTheJar.instance.getConfig().getBoolean("consumeBottleOnUse")) {
                         event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
                     } else {
-                        event.getItem().setDurability((short)0);
+                        XPInTheJar.setXpStored(item, 0);
                     }
                 }
             }

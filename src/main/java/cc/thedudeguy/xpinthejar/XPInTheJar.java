@@ -19,10 +19,13 @@ package cc.thedudeguy.xpinthejar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import cc.thedudeguy.xpinthejar.databases.Bank;
@@ -32,6 +35,7 @@ import cc.thedudeguy.xpinthejar.listeners.BottleListener;
 public class XPInTheJar extends JavaPlugin {
 
     public static XPInTheJar instance;
+    public static Logger logger;
     protected static String STACK_BY_DATA_FN = "a";
 
     public boolean spoutEnabled = false;
@@ -39,11 +43,11 @@ public class XPInTheJar extends JavaPlugin {
     /**
      * Calculates the exact amount of Experience in a given Level.
      *
-     * @param level Integer - the level to get converted into an XP amount
+     * @param level int - the level to get converted into an XP amount
      * @return Integer the Total xp in provided level
      */
     public static final int calculateLevelToExp(float level) {
-        return (int)Math.round( (1.75 * (Math.pow(level, 2)) + ( 5 * level ) ));
+        return (int) Math.round((1.75 * (Math.pow(level, 2)) + (5 * level)));
     }
 
     /**
@@ -52,19 +56,51 @@ public class XPInTheJar extends JavaPlugin {
      * @return
      */
     public static final int calculateLevelToExp(int level) {
-        return calculateLevelToExp((float)level);
+        return calculateLevelToExp((float) level);
+    }
+
+    public static int getXpStored(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        List<String> lore;
+        if(meta.hasLore()) {
+            lore = meta.getLore();
+            if(lore.isEmpty()) {
+                return 0;
+            }
+            String l = lore.get(0);
+            int xp;
+            try {
+                xp = Integer.parseInt(l.split(" ")[0]);
+            } catch(NumberFormatException e) {
+                return 0;
+            }
+            return xp;
+        }
+        return 0;
+    }
+
+    public static void setXpStored(ItemStack item, int xp) {
+        ItemMeta meta = item.getItemMeta();
+        if(xp < 1) {
+            meta.setLore(null);
+            item.setItemMeta(meta);
+            return;
+        }
+        List<String> lore = new ArrayList<>();
+        lore.add(xp + " xp collected");
+        meta.setLore(lore);
+        item.setItemMeta(meta);
     }
 
     /**
      * Actions to enable this plugin
      */
-    public void onEnable()
-    {
+    public void onEnable() {
         instance = this;
+        logger = getLogger();
 
         //copy the config
-        this.getConfig().options().copyDefaults(true);
-        this.saveConfig();
+        saveDefaultConfig();
 
         //ResourceManager.preLoginCache();
         setupDatabase();
@@ -78,12 +114,12 @@ public class XPInTheJar extends JavaPlugin {
         }
 
         //check for spout
-        if (Bukkit.getPluginManager().isPluginEnabled("Spout")) {
-            if (getConfig().getBoolean("enableSpout")) {
-                Bukkit.getLogger().log(Level.INFO, "[XP In The Jar] Spout present. Enabling Spout features.");
+        if(Bukkit.getPluginManager().isPluginEnabled("Spout")) {
+            if(getConfig().getBoolean("enableSpout")) {
+                XPInTheJar.logger.log(Level.INFO, "Spout present. Enabling Spout features.");
                 spoutEnabled = true;
             } else {
-                Bukkit.getLogger().log(Level.INFO, "[XP In The Jar] Disabling Spout features even though Spout is present.");
+                XPInTheJar.logger.log(Level.INFO, "Disabling Spout features even though Spout is present.");
             }
         }
 
@@ -120,19 +156,19 @@ public class XPInTheJar extends JavaPlugin {
          * *****************************************************************************************************
          */
 
-        Bukkit.getLogger().log(Level.INFO, "[XP in the Jar] Enabled.");
+        getLogger().log(Level.INFO, "Enabled.");
     }
 
     public void onDisable()
     {
-        Bukkit.getLogger().log(Level.INFO, "[XP in the Jar] Disabled.");
+        getLogger().log(Level.INFO, "Disabled.");
     }
 
     private void setupDatabase() {
         try {
             getDatabase().find(Bank.class).findRowCount();
         } catch (PersistenceException ex) {
-            Bukkit.getLogger().log(Level.INFO, "[XP in the Jar] Installing database for " + getDescription().getName() + " due to first time usage");
+            getLogger().log(Level.INFO, "Installing database for " + getDescription().getName() + " due to first time usage");
             installDDL();
         }
     }
@@ -143,4 +179,5 @@ public class XPInTheJar extends JavaPlugin {
         list.add(Bank.class);
         return list;
     }
+
 }
