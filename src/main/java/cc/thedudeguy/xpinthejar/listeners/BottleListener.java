@@ -18,49 +18,6 @@ import cc.thedudeguy.xpinthejar.util.Debug;
 public class BottleListener implements Listener {
 
     /**
-     * To show a chat message that a player clicked on an xp bottle
-     * @param event
-     */
-    @EventHandler
-    public void OnClickXpBottle(InventoryClickEvent event) {
-        ItemStack item = event.getCurrentItem();
-
-        if(item == null || !item.getType().equals(Material.GLASS_BOTTLE) || XPInTheJar.getXpStored(item) <= 0 || !(event.getWhoClicked() instanceof Player)) {
-            return;
-        }
-
-        if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getWhoClicked()).isSpoutCraftEnabled()) {
-            ((SpoutPlayer) event.getWhoClicked()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
-        } else {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage(" ");
-            player.sendMessage("-- Exp Bottle --");
-            player.sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
-        }
-    }
-
-    /**
-     * To show a chat message that a player is in fact holding an xp bottle
-     * @param event
-     */
-    @EventHandler
-    public void OnHoldXpBottle(PlayerItemHeldEvent event) {
-        ItemStack item = event.getPlayer().getInventory().getItem(event.getNewSlot());
-
-        if(item == null || !item.getType().equals(Material.GLASS_BOTTLE) || XPInTheJar.getXpStored(item) <= 0) {
-            return;
-        }
-
-        if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-            ((SpoutPlayer)event.getPlayer()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
-        } else {
-            event.getPlayer().sendMessage(" ");
-            event.getPlayer().sendMessage("-- Exp Bottle --");
-            event.getPlayer().sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
-        }
-    }
-
-    /**
      * Handle Bottling Experience when holding a bottle while picking up Experience
      *
      * @param event
