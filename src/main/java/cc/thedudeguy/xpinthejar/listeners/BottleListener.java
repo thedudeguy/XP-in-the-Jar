@@ -50,15 +50,16 @@ public class BottleListener implements Listener {
     public void OnHoldXpBottle(PlayerItemHeldEvent event) {
         ItemStack item = event.getPlayer().getInventory().getItem(event.getNewSlot());
 
-        if (item != null && item.getType().equals(Material.GLASS_BOTTLE) && XPInTheJar.getXpStored(item) > 0) {
+        if(item == null || !item.getType().equals(Material.GLASS_BOTTLE) || XPInTheJar.getXpStored(item) <= 0) {
+            return;
+        }
 
-            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
-            } else {
-                event.getPlayer().sendMessage(" ");
-                event.getPlayer().sendMessage("-- Exp Bottle --");
-                event.getPlayer().sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
-            }
+        if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
+            ((SpoutPlayer)event.getPlayer()).sendNotification("Exp Bottle", "Total: " + XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
+        } else {
+            event.getPlayer().sendMessage(" ");
+            event.getPlayer().sendMessage("-- Exp Bottle --");
+            event.getPlayer().sendMessage("-- Total: " + XPInTheJar.getXpStored(item) + "xp");
         }
     }
 
@@ -77,8 +78,9 @@ public class BottleListener implements Listener {
         if (!item.getType().equals(Material.GLASS_BOTTLE)) {
             return;
         }
-        if (XPInTheJar.instance.getConfig().getBoolean("bottleRequireCrouch") && !event.getPlayer().isSneaking()) return;
-
+        if (XPInTheJar.instance.getConfig().getBoolean("bottleRequireCrouch") && !event.getPlayer().isSneaking()) {
+            return;
+        }
         if (item.getAmount() > 1) {
             event.getPlayer().sendMessage("Your holding too many bottles to collect XP, try holding just one.");
             return;
@@ -91,7 +93,6 @@ public class BottleListener implements Listener {
         } else {
             event.getPlayer().sendMessage("Collected " + event.getAmount() + " xp for a total of " + XPInTheJar.getXpStored(item));
         }
-
         event.setAmount(0);
     }
 
