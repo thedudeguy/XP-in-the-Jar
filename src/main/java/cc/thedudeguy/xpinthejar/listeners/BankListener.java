@@ -18,7 +18,7 @@ import cc.thedudeguy.xpinthejar.XPInTheJar;
 import cc.thedudeguy.xpinthejar.databases.Bank;
 import cc.thedudeguy.xpinthejar.util.Debug;
 
-    public class BankListener implements Listener {
+public class BankListener implements Listener {
 
     /**
      * To fix the issue where enchanting doesnt update a players Total Experience (for getTotalExperience()),

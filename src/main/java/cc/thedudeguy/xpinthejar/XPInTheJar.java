@@ -16,8 +16,6 @@
  **/
 package cc.thedudeguy.xpinthejar;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,7 +39,7 @@ public class XPInTheJar extends JavaPlugin {
     /**
      * Calculates the exact amount of Experience in a given Level.
      *
-     * @param Integer level - the level to get converted into an XP amount
+     * @param level Integer - the level to get converted into an XP amount
      * @return Integer the Total xp in provided level
      */
     public static final int calculateLevelToExp(float level) {
@@ -49,7 +47,7 @@ public class XPInTheJar extends JavaPlugin {
     }
 
     /**
-     * @see calculateLevelToExp
+     * @see XPInTheJar#calculateLevelToExp
      * @param level
      * @return
      */
@@ -96,28 +94,28 @@ public class XPInTheJar extends JavaPlugin {
          *
          */
         // prevent bottle stacking
-        try {
-            boolean ok = false;
-            try {
-                // attempt to make books with different data values stack separately
-                Method method = net.minecraft.server.Item.class.getDeclaredMethod(STACK_BY_DATA_FN, boolean.class);
-                if (method.getReturnType() == net.minecraft.server.Item.class) {
-                    method.setAccessible(true);
-                    method.invoke(net.minecraft.server.Item.GLASS_BOTTLE, true);
-                    ok = true;
-                }
-            } catch (Exception e) {
+        // try {
+        //     boolean ok = false;
+        //     try {
+        //         // attempt to make books with different data values stack separately
+        //         Method method = net.minecraft.server.Item.class.getDeclaredMethod(STACK_BY_DATA_FN, boolean.class);
+        //         if (method.getReturnType() == net.minecraft.server.Item.class) {
+        //             method.setAccessible(true);
+        //             method.invoke(net.minecraft.server.Item.GLASS_BOTTLE, true);
+        //             ok = true;
+        //         }
+        //     } catch (Exception e) {
 
-            }
-            if (!ok) {
-                // otherwise limit stack size to 1
-                Field field = net.minecraft.server.Item.class.getDeclaredField("maxStackSize");
-                field.setAccessible(true);
-                field.setInt(net.minecraft.server.Item.GLASS_BOTTLE, 1);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //     }
+        //     if (!ok) {
+        //         // otherwise limit stack size to 1
+        //         Field field = net.minecraft.server.Item.class.getDeclaredField("maxStackSize");
+        //         field.setAccessible(true);
+        //         field.setInt(net.minecraft.server.Item.GLASS_BOTTLE, 1);
+        //     }
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
         /*
          * *****************************************************************************************************
          */

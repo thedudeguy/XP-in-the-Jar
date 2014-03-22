@@ -1,10 +1,6 @@
 package cc.thedudeguy.xpinthejar.listeners;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Packet18ArmAnimation;
-
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -97,8 +93,6 @@ public class BottleListener implements Listener {
             }
 
             event.setAmount(0);
-            EntityPlayer p = ((CraftPlayer)event.getPlayer()).getHandle();
-            p.netServerHandler.sendPacket(new Packet18ArmAnimation(p, 1));
 
         }
 
