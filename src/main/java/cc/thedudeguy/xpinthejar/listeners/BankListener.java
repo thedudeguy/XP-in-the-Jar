@@ -60,25 +60,25 @@ public class BankListener implements Listener {
             player.giveExp(bank.getXp());
             bank.setXp(0);
             XPInTheJar.instance.getDatabase().save(bank);
-         }
-     }
+        }
+    }
 
     /**
      * Handle Block interaction with a Bank Block or a Deposit Block.
      * @param event
      */
-     @EventHandler
+    @EventHandler
     public void onBlockInteract(PlayerInteractEvent event) {
-         if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-             return;
-         }
-         // If we are interacting with a cauldron, we want to deposit xp
-         if (event.getClickedBlock().getType().equals(Material.CAULDRON)) {
-             processCauldronInteraction(event);
-         } else if (event.getClickedBlock().getType().equals(Material.DIAMOND_BLOCK)) {
-             //If we are interacting with a diamond block, we want to withdraw xp
-             processDiamondBlockInteraction(event);
-         }
+        if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            return;
+        }
+        // If we are interacting with a cauldron, we want to deposit xp
+        if (event.getClickedBlock().getType().equals(Material.CAULDRON)) {
+            processCauldronInteraction(event);
+        } else if (event.getClickedBlock().getType().equals(Material.DIAMOND_BLOCK)) {
+            //If we are interacting with a diamond block, we want to withdraw xp
+            processDiamondBlockInteraction(event);
+        }
     }
 
     private void processCauldronInteraction(PlayerInteractEvent event) {
