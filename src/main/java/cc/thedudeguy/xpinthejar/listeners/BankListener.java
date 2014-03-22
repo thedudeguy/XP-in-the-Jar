@@ -56,6 +56,7 @@ public class BankListener implements Listener {
                 player.sendMessage("Retrieved " + bank.getXp() + "xp");
             }
 
+            updateSigns(bankBlock, null);
             player.giveExp(bank.getXp());
             bank.setXp(0);
             XPInTheJar.instance.getDatabase().save(bank);
