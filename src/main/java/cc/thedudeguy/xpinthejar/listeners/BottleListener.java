@@ -51,17 +51,17 @@ public class BottleListener implements Listener {
     }
 
     /**
-     * Handle Block interaction with a Bank Block or a Deposit Block.
+     * Handle bottle right click to consume xp stored in it
      * @param event
      */
      @EventHandler
      public void onBlockInteract(PlayerInteractEvent event) {
-         if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+         if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && !event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
              return;
          }
 
          ItemStack item = event.getItem();
-         if(item == null || !item.getType().equals(Material.GLASS_BOTTLE) || XPInTheJar.getXpStored(item) <= 0 || event.isCancelled()) {
+         if(item == null || !item.getType().equals(Material.GLASS_BOTTLE) || XPInTheJar.getXpStored(item) <= 0) {
              return;
          }
          if (item.getAmount() != 1) {
@@ -83,4 +83,5 @@ public class BottleListener implements Listener {
              XPInTheJar.setXpStored(item, 0);
          }
      }
+
 }
