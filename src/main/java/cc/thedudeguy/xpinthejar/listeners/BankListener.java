@@ -46,12 +46,14 @@ public class BankListener implements Listener {
             Bank bank = getBank(bankBlock);
             Player player = event.getPlayer();
 
-            if (bank == null || bank.getXp() < 1) return;
+            if (bank == null || bank.getXp() < 1) {
+                return;
+            }
 
             if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Bank Destroyed", "Retrieved " + String.valueOf(bank.getXp()) + "xp", Material.GLASS_BOTTLE);
+                ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Bank Destroyed", "Retrieved " + bank.getXp() + "xp", Material.GLASS_BOTTLE);
             } else {
-                player.sendMessage("Retrieved " + String.valueOf(bank.getXp()) + "xp");
+                player.sendMessage("Retrieved " + bank.getXp() + "xp");
             }
 
             player.giveExp(bank.getXp());
@@ -225,7 +227,9 @@ public class BankListener implements Listener {
     }
 
     public void updateSigns(Block bankBlock, Bank bank) {
-        if (bank == null || bankBlock == null) return;
+        if (bank == null || bankBlock == null) {
+            return;
+        }
         BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
         for(BlockFace bf : blockFaces) {
             Block relBlock = bankBlock.getRelative(bf);
