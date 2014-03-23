@@ -25,6 +25,7 @@ import javax.persistence.PersistenceException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,26 +41,39 @@ public class XPInTheJar extends JavaPlugin {
     public static String xpBottleName = ChatColor.AQUA + "XP Bottle";
     
     public boolean spoutEnabled = false;
-
+    
     /**
-     * Calculates the exact amount of Experience in a given Level.
-     *
-     * @param level int - the level to get converted into an XP amount
-     * @return Integer the Total xp in provided level
-     */
-    public static final int calculateLevelToExp(float level) {
-        return (int) Math.round((1.75 * (Math.pow(level, 2)) + (5 * level)));
-    }
-
-    /**
-     * @see XPInTheJar#calculateLevelToExp
-     * @param level
+     * Checks if an item is an EXP Bottle.
+     * Can probably do this better lulx
+     * @param item
      * @return
      */
-    public static final int calculateLevelToExp(int level) {
-        return calculateLevelToExp((float) level);
+    public static boolean isItemXPBottle(ItemStack item) {
+    	// not a potion not a bottle
+        if (!item.getType().equals(Material.POTION)) {
+            return false;
+        }
+        // not 0 -> not water -> not xp bottle
+        if (item.getDurability() > 0) {
+            return false;
+        }
+        // no display name = not xp bottle
+        if (!item.getItemMeta().hasDisplayName()) {
+            return false;
+        }
+        // display name doesnt match = not xp bottle
+        if (!item.getItemMeta().getDisplayName().equals(XPInTheJar.xpBottleName)) {
+            return false;
+        }
+        
+        //only 1 in stack (failsafe?)
+        if (item.getAmount() != 1) {
+            return false;
+        }
+        
+        return true;
     }
-
+    
     public static int getXpStored(ItemStack item) {
         PotionMeta meta = (PotionMeta)item.getItemMeta();
         List<String> lore;

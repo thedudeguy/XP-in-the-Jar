@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -25,6 +24,7 @@ public class BankListener implements Listener {
      * causing an issue the next time you try to deposit Exp into an xp bank.
      * @param event
      */
+	/*
     @EventHandler
     public void onItemEnchant(EnchantItemEvent event) {
         Debug.debug(event.getEnchanter(), "Item Enchanted");
@@ -33,36 +33,44 @@ public class BankListener implements Listener {
         Debug.debug(event.getEnchanter(), "Total Exp cost is ", expCost);
         event.getEnchanter().setTotalExperience(event.getEnchanter().getTotalExperience() - expCost);
     }
-
+	*/
+	
     /**
      * Handle returning the xp in the bank block to the user who broke the block, so it is not lost forevor
      *
      * @param event
      */
+    
     @EventHandler
     public void onBlockDestoy(BlockBreakEvent event) {
-        if (event.getBlock().getType().equals(Material.DIAMOND_BLOCK)) {
-            Block bankBlock = event.getBlock();
-            Bank bank = getBank(bankBlock);
-            Player player = event.getPlayer();
-
-            if (bank == null || bank.getXp() < 1) {
-                return;
-            }
-
-            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Bank Destroyed", "Retrieved " + bank.getXp() + "xp", Material.GLASS_BOTTLE);
-            } else {
-                player.sendMessage("Retrieved " + bank.getXp() + "xp");
-            }
-
-            updateSigns(bankBlock, null);
-            player.giveExp(bank.getXp());
-            bank.setXp(0);
-            XPInTheJar.instance.getDatabase().save(bank);
+        if (!event.getBlock().getType().equals(Material.DIAMOND_BLOCK)) {
+        	return;
         }
+        	
+        Block bankBlock = event.getBlock();
+        Player player = event.getPlayer();
+        
+        if (!Bank.hasBank(bankBlock)) {
+        	// no bank do nothing.
+        	return;
+        }
+        
+        int balance = Bank.getBankBalance(bankBlock);
+        
+        if (balance <= 0) {
+        	player.sendMessage("The bank was empty.");
+        } else {
+        	player.giveExp(balance);
+        	if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
+        		((SpoutPlayer)player).sendNotification( "Exp Bank Destroyed", "Retrieved " + String.valueOf(balance) + "xp", Material.GLASS_BOTTLE);
+            } else {
+            	player.sendMessage("You recovered " + String.valueOf(balance) + " Exp from the destroyed bank");
+            }
+        }	
+        updateSigns(bankBlock, "Destroyed");
+        Bank.destroyBank(bankBlock);
     }
-
+    
     /**
      * Handle Block interaction with a Bank Block or a Deposit Block.
      * @param event
@@ -80,171 +88,131 @@ public class BankListener implements Listener {
             processDiamondBlockInteraction(event);
         }
     }
-
+    
     private void processCauldronInteraction(PlayerInteractEvent event) {
-        ItemStack item = event.getPlayer().getItemInHand();
-
-        //get a connected bank.
+    	
+    	Player player = event.getPlayer();
+    	
+    	//get a connected bank.
         Block bankBlock = getConnectedBankBlock(event.getClickedBlock());
         if (bankBlock == null) {
             return;
         }
-
-        Bank bank = getBank(bankBlock, true);
-        if (bank == null) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        //if we have a bottle than we should empty the contents of the bottle into the cauldron.
-        if (item != null && item.getType().equals(Material.GLASS_BOTTLE) && XPInTheJar.getXpStored(item) > 0) {
-            if (item.getAmount() > 1) {
-                player.sendMessage("You are holding too many bottles, try holding just one");
-                return;
-            }
-            int toDeposit = XPInTheJar.getXpStored(item);
-            bank.add(toDeposit);
-
-            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification( "Bottle Deposited", toDeposit + "xp", Material.GLASS_BOTTLE);
-            } else {
-                player.sendMessage("Deposited Bottle:" + toDeposit + "xp");
-            }
-
+        
+    	//are we depositing from a bottle?
+    	if(XPInTheJar.isItemXPBottle(player.getItemInHand()) && XPInTheJar.getXpStored(player.getItemInHand()) > 0) {
+    		
+    		ItemStack bottle = player.getItemInHand();
+    		int toDeposit = XPInTheJar.getXpStored(bottle);
+    		
+    		this.depositExp(player, bankBlock, toDeposit);
+    		
             if (XPInTheJar.instance.getConfig().getBoolean("consumeBottleOnDeposit")) {
                 player.setItemInHand(new ItemStack(Material.AIR));
             } else {
-                XPInTheJar.setXpStored(item, 0);
+            	player.setItemInHand(new ItemStack(Material.GLASS_BOTTLE));
             }
-        } else {
-            // no bottle in hand, deposit from player
-            if (player.getTotalExperience() < 1) {
-                return;
-            }
-
-            /*
-            if getExp() is 0, than the player is exactly at a level
-            in which we can sequencially remove levels with precision.
-            otherwise, a partial level has been obtained, and we will go ahead and deposit that
-            partial amount. If a player has no exp, and is level 0, this part of the
-            code cannot be reached since it will have already returned, so we dont have to worry
-            about taking more than possible.
-            */
-            if (player.getExp() == 0) {
-                // here the player is at an exact level, so we can start subtracting exp by the level
-                int toDeposit = player.getTotalExperience() - (XPInTheJar.calculateLevelToExp(player.getLevel()-1));
-                bank.add(toDeposit);
-                player.setTotalExperience(player.getTotalExperience()-toDeposit);
-                player.setLevel(player.getLevel()-1);
-                player.setExp(0);
-
-                if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                    ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Deposited", String.valueOf(toDeposit) + "xp", Material.GLASS_BOTTLE);
-                } else {
-                    player.sendMessage("Exp Deposited:" + String.valueOf(toDeposit) + "xp");
-                }
-            } else {
-                // calculate how much xp into the level they have, and thats what will be deposited
-                int toDeposit = player.getTotalExperience() - (XPInTheJar.calculateLevelToExp(player.getLevel()));
-                bank.add(toDeposit);
-                player.setTotalExperience(XPInTheJar.calculateLevelToExp(player.getLevel()));
-                player.setLevel(player.getLevel());
-                player.setExp(0);
-
-                if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                    ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Deposited", String.valueOf(toDeposit) + "xp", Material.GLASS_BOTTLE);
-                } else {
-                    player.sendMessage("Exp Deposited:" + String.valueOf(toDeposit) + "xp");
-                }
-            }
-        }
-
-        XPInTheJar.instance.getDatabase().save(bank);
-        updateSigns(bankBlock, bank);
+            
+            return;
+    	}
+    	
+    	Debug.debug(player, "################################");
+    	Debug.debug(player, "Exp (% into level): ", player.getExp());
+    	Debug.debug(player, "Exp to level: ", player.getExpToLevel());
+    	Debug.debug(player, "Level: ", player.getLevel());
+    	Debug.debug(player, "Total Exp: ", player.getTotalExperience());
+    	
+    	// nothing to deposit if nothing left
+    	if (player.getTotalExperience() <= 0) {
+    		return;
+    	}
+    	// nothing to deposit (also in case)
+    	if (player.getLevel() <= 0 && player.getExp() <= 0) {
+    		return;
+    	}
+    	
+    	//partial level deposit
+    	if (player.getExp() > 0) {
+    		//calculate xp into level.
+    		int intoLevel = (int) (player.getExpToLevel() * player.getExp());
+    		Debug.debug(player, "XP Into Level: ", intoLevel);
+    		
+    		//deposit into level.
+    		player.setTotalExperience(player.getTotalExperience() - intoLevel);
+            player.setLevel(player.getLevel());
+            player.setExp(0);
+            
+            depositExp(player, bankBlock, intoLevel);
+            
+            return;
+    	}
+    	
+    	// full level deposit
+    	player.setLevel(player.getLevel() - 1);
+    	player.setExp(0);
+    	// failsafe -> fixes issues when going into the negative (in case this happens)
+    	if (player.getLevel() < 0) {
+    		player.setLevel(0);
+    		player.setExp(0);
+    		player.setTotalExperience(0);
+    		return;
+    	}
+    	
+    	int levelXP = player.getExpToLevel();
+    	player.setTotalExperience(player.getTotalExperience() - levelXP);
+    	
+    	//deposit levelXP
+    	depositExp(player, bankBlock, levelXP);
+    	
     }
-
+    
     private void processDiamondBlockInteraction(PlayerInteractEvent event) {
-        Block bankBlock = event.getClickedBlock();
-        Player player = event.getPlayer();
-        Bank bank = getBank(bankBlock);
-
-        if (bank == null || bank.getXp() < 1) {
-            return;
-        }
-
-        // we will set the toWithdrawel to be what is required for the player to level up.
-        int toWithdraw = XPInTheJar.calculateLevelToExp(player.getLevel()+1) - player.getTotalExperience();
-
-        if (bank.getXp() < toWithdraw) {
-            toWithdraw = bank.getXp();
-            bank.deduct(toWithdraw);
-            player.giveExp(toWithdraw);
-
-            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Withdrawn", toWithdraw + "xp", Material.GLASS_BOTTLE);
-            } else {
-                player.sendMessage("Exp Withdrawn:" + toWithdraw + "xp");
-            }
-        } else {
-            bank.deduct(toWithdraw);
-            player.giveExp(toWithdraw);
-            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)event.getPlayer()).sendNotification( "Exp Withdrawn", toWithdraw + "xp", Material.GLASS_BOTTLE);
-            } else {
-                player.sendMessage("Exp Withdrawn:" + toWithdraw + "xp");
-            }
-        }
-
-        XPInTheJar.instance.getDatabase().save(bank);
-        updateSigns(bankBlock, bank);
+    	
+    	Block bankBlock = event.getClickedBlock();
+    	Player player = event.getPlayer();
+    	
+    	int balance = Bank.getBankBalance(bankBlock);
+    	
+    	if (balance < 1) {
+    		player.sendMessage("This bank is empty");
+    		return;
+    	}
+    	
+    	// we will set the withdrawel to be what is required for the player to level up.
+    	int withdrawel;
+    	if (player.getExp() > 0) {
+    		withdrawel = player.getExpToLevel() - ((int) (player.getExpToLevel() * player.getExp()));
+    	} else {
+    		withdrawel = player.getExpToLevel();
+    	}
+    	
+    	// bank might not have enough for that
+    	if (balance < withdrawel) {
+    		withdrawel = balance;
+    	}
+    	
+    	player.giveExp(withdrawel);
+    	
+    	withdrawExp(player, bankBlock, withdrawel);
     }
-
-    public Bank getBank(Block bankBlock) {
-        return getBank(bankBlock, false);
-    }
-
-    public Bank getBank(Block bankBlock, boolean createIfNone) {
-        Bank bank = XPInTheJar.instance.getDatabase().find(Bank.class)
-            .where()
-                .eq("x", bankBlock.getX())
-                .eq("y", bankBlock.getY())
-                .eq("z", bankBlock.getZ())
-                .ieq("worldName", bankBlock.getWorld().getName())
-                    .findUnique();
-
-        if (bank == null) {
-            if (createIfNone) {
-                bank = new Bank();
-                bank.setX(bankBlock.getX());
-                bank.setY(bankBlock.getY());
-                bank.setZ(bankBlock.getZ());
-                bank.setWorldName(bankBlock.getWorld().getName());
-                bank.setXp(0);
-                return bank;
-            }
-            return null;
-        }
-        return bank;
-    }
-
-    public void updateSigns(Block bankBlock, Bank bank) {
-        if (bankBlock == null) {
-            return;
-        }
+    
+    
+    public void updateSigns(Block bankBlock, Object balance) {
         BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
         for(BlockFace bf : blockFaces) {
             Block relBlock = bankBlock.getRelative(bf);
             if (relBlock.getType().equals(Material.SIGN) || relBlock.getType().equals(Material.SIGN_POST) || relBlock.getType().equals(Material.WALL_SIGN)) {
                 Sign sign = (Sign)relBlock.getState();
                 sign.setLine(0, "");
-                sign.setLine(1, bank == null ? "" : "XP Bank");
-                sign.setLine(2, bank == null ? "" : String.valueOf(bank.getXp()));
+                sign.setLine(1, "XP Bank");
+                sign.setLine(2, balance.toString());
                 sign.setLine(3, "");
                 sign.update(true);
             }
         }
     }
 
+    
     public Block getConnectedBankBlock(Block bankInputBlock) {
         if (bankInputBlock.getRelative(BlockFace.UP).getType().equals(Material.DIAMOND_BLOCK)) {
             return bankInputBlock.getRelative(BlockFace.UP);
@@ -261,5 +229,38 @@ public class BankListener implements Listener {
         }
         return null;
     }
-
+    
+    public void depositExp(Player player, Block bankBlock, int amount) {
+    	
+    	depositExp(bankBlock, amount);
+    	
+    	if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)player).isSpoutCraftEnabled()) {
+            ((SpoutPlayer)player).sendNotification( "Exp Deposited", String.valueOf(amount) + "xp", Material.GLASS_BOTTLE);
+        } else {
+            player.sendMessage("Exp Deposited: " + String.valueOf(amount) + " xp");
+        }
+    	
+    	//TODO: Play cool sound
+    }
+    
+    public void depositExp(Block bankBlock, int amount) {
+    	int balance = Bank.addToBankBlock(bankBlock, amount);
+    	Debug.debug("Added ", amount, " to bank to make a new balance of ", balance);
+    	updateSigns(bankBlock, balance);
+    }
+    
+    public void withdrawExp(Player player, Block bankBlock, int amount) {
+    	withdrawExp(bankBlock, amount);
+    	if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)player).isSpoutCraftEnabled()) {
+            ((SpoutPlayer)player).sendNotification( "Exp Withdrawn", amount + "xp", Material.GLASS_BOTTLE);
+        } else {
+            player.sendMessage("Exp Withdrawn: " + amount + " xp");
+        }
+    }
+    
+    public void withdrawExp(Block bankBlock, int amount) {
+    	int balance = Bank.deductFromBankBlock(bankBlock, amount);
+    	Debug.debug("Withdrew ", amount, " to bank to make a new balance of ", balance);
+    	updateSigns(bankBlock, balance);
+    }
 }
