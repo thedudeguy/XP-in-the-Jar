@@ -24,8 +24,10 @@ import java.util.logging.Logger;
 import javax.persistence.PersistenceException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import cc.thedudeguy.xpinthejar.databases.Bank;
@@ -37,7 +39,8 @@ public class XPInTheJar extends JavaPlugin {
     public static XPInTheJar instance;
     public static Logger logger;
     protected static String STACK_BY_DATA_FN = "a";
-
+    public static String xpBottleName = ChatColor.AQUA + "XP Bottle";
+    
     public boolean spoutEnabled = false;
 
     /**
@@ -60,7 +63,7 @@ public class XPInTheJar extends JavaPlugin {
     }
 
     public static int getXpStored(ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
+        PotionMeta meta = (PotionMeta)item.getItemMeta();
         List<String> lore;
         if(meta.hasLore()) {
             lore = meta.getLore();
@@ -80,7 +83,7 @@ public class XPInTheJar extends JavaPlugin {
     }
 
     public static void setXpStored(ItemStack item, int xp) {
-        ItemMeta meta = item.getItemMeta();
+        PotionMeta meta = (PotionMeta)item.getItemMeta();
         if(xp < 1) {
             meta.setLore(null);
             item.setItemMeta(meta);
