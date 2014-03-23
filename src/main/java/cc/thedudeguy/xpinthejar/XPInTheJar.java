@@ -125,39 +125,6 @@ public class XPInTheJar extends JavaPlugin {
             }
         }
 
-        /* ******************************************************************************************************
-         * This section was written by Nisovin, for the BookWorm plugin
-         * which can be found at. http://code.google.com/p/nisovin-minecraft-bukkit-plugins/
-         * I have modified it for use with XPInTheJar
-         *
-         */
-        // prevent bottle stacking
-        // try {
-        //     boolean ok = false;
-        //     try {
-        //         // attempt to make books with different data values stack separately
-        //         Method method = net.minecraft.server.Item.class.getDeclaredMethod(STACK_BY_DATA_FN, boolean.class);
-        //         if (method.getReturnType() == net.minecraft.server.Item.class) {
-        //             method.setAccessible(true);
-        //             method.invoke(net.minecraft.server.Item.GLASS_BOTTLE, true);
-        //             ok = true;
-        //         }
-        //     } catch (Exception e) {
-
-        //     }
-        //     if (!ok) {
-        //         // otherwise limit stack size to 1
-        //         Field field = net.minecraft.server.Item.class.getDeclaredField("maxStackSize");
-        //         field.setAccessible(true);
-        //         field.setInt(net.minecraft.server.Item.GLASS_BOTTLE, 1);
-        //     }
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        // }
-        /*
-         * *****************************************************************************************************
-         */
-
         getLogger().log(Level.INFO, "Enabled.");
     }
 
