@@ -37,7 +37,6 @@ public class XPInTheJar extends JavaPlugin {
 
     public static XPInTheJar instance;
     public static Logger logger;
-    protected static String STACK_BY_DATA_FN = "a";
     public static String xpBottleName = ChatColor.AQUA + "XP Bottle";
     
     public boolean spoutEnabled = false;
