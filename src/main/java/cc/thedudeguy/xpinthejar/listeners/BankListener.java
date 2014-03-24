@@ -20,22 +20,6 @@ import cc.thedudeguy.xpinthejar.util.Debug;
 public class BankListener implements Listener {
 
     /**
-     * To fix the issue where enchanting doesnt update a players Total Experience (for getTotalExperience()),
-     * causing an issue the next time you try to deposit Exp into an xp bank.
-     * @param event
-     */
-	/*
-    @EventHandler
-    public void onItemEnchant(EnchantItemEvent event) {
-        Debug.debug(event.getEnchanter(), "Item Enchanted");
-
-        int expCost = XPInTheJar.calculateLevelToExp(event.getExpLevelCost());
-        Debug.debug(event.getEnchanter(), "Total Exp cost is ", expCost);
-        event.getEnchanter().setTotalExperience(event.getEnchanter().getTotalExperience() - expCost);
-    }
-	*/
-
-    /**
      * Handle returning the xp in the bank block to the user who broke the block, so it is not lost forevor
      *
      * @param event
