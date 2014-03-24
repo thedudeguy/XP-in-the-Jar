@@ -1,7 +1,5 @@
 package cc.thedudeguy.xpinthejar.util;
 
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -12,31 +10,27 @@ public class Debug {
 
     public static final String tag = "XP-in-the-Jar";
 
-    public static void debug(String debugText) {
-        if (XPInTheJar.instance.getConfig().getBoolean("debug")) {
-            XPInTheJar.logger.log(Level.INFO, debugText);
-        }
-    }
-
     public static void debug(Object... debugTexts) {
-        String allText = "";
-        for (Object debugText : debugTexts) {
-            allText = allText + debugText.toString();
-        }
-        debug(allText);
+        debug(null, debugTexts);
     }
 
     public static void debug(Player player, String debugText) {
         if (XPInTheJar.instance.getConfig().getBoolean("debug")) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[" + tag + "] &7" + debugText));
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.GOLD + "[" + tag + "] " + ChatColor.YELLOW + player.getName() + ": " + debugText);
+            if(player != null) {
+                player.sendMessage(ChatColor.DARK_GRAY + "[" + tag + "] " + ChatColor.GRAY + debugText);
+            }
+            StringBuilder message = new StringBuilder(ChatColor.GOLD + "[" + tag + "] ");
+            if(player != null) {
+                message.append(player.getName()).append(": ");
+            }
+            Bukkit.getServer().getConsoleSender().sendMessage(message.append(debugText).toString());
         }
     }
 
     public static void debug(Player player, Object... debugTexts) {
-        String allText = "";
+        StringBuilder allText = new StringBuilder();
         for (Object debugText : debugTexts) {
-            allText = allText + debugText.toString();
+            allText.append(debugText.toString());
         }
         debug(player, allText);
     }

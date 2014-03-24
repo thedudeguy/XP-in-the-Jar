@@ -39,9 +39,9 @@ public class XPInTheJar extends JavaPlugin {
     public static XPInTheJar instance;
     public static Logger logger;
     public static String xpBottleName = ChatColor.AQUA + "XP Bottle";
-    
+
     public boolean spoutEnabled = false;
-    
+
     /**
      * Checks if an item is an EXP Bottle.
      * Can probably do this better lulx
@@ -49,7 +49,7 @@ public class XPInTheJar extends JavaPlugin {
      * @return
      */
     public static boolean isItemXPBottle(ItemStack item) {
-    	// not a potion not a bottle
+        // not a potion not a bottle
         if (!item.getType().equals(Material.POTION)) {
             return false;
         }
@@ -65,15 +65,15 @@ public class XPInTheJar extends JavaPlugin {
         if (!item.getItemMeta().getDisplayName().equals(XPInTheJar.xpBottleName)) {
             return false;
         }
-        
+
         //only 1 in stack (failsafe?)
         if (item.getAmount() != 1) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     public static int getXpStored(ItemStack item) {
         PotionMeta meta = (PotionMeta)item.getItemMeta();
         List<String> lore;

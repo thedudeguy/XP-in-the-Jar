@@ -88,43 +88,43 @@ public class Bank {
     public void deduct(int amount) {
         setXp(getXp() - amount);
     }
-    
+
     /**
      * Checks if a block has a bank tied to it.
      * @param bankBlock
      * @return
      */
     public static boolean hasBank(Block bankBlock) {
-    	Bank bank = getBank(bankBlock, false);
-    	if (bank == null) {
-    		return false;
-    	}
-    	return true;
+        Bank bank = getBank(bankBlock, false);
+        if (bank == null) {
+            return false;
+        }
+        return true;
     }
-    
+
     /**
      * Removes block's tied bank from the database
      * @param bankBlock
      */
     public static void destroyBank(Block bankBlock) {
-    	Bank bank = getBank(bankBlock, false);
-    	if (bank == null) {
-    		//nothing to do.
-    		return;
-    	}
-    	XPInTheJar.instance.getDatabase().delete(bank);
+        Bank bank = getBank(bankBlock, false);
+        if (bank == null) {
+            //nothing to do.
+            return;
+        }
+        XPInTheJar.instance.getDatabase().delete(bank);
     }
-    
+
     /**
      * Gets the balance of the bank tied to a block
      * @param bankBlock
      * @return
      */
     public static int getBankBalance(Block bankBlock) {
-    	Bank bank = getBank(bankBlock);
-    	return bank.getXp();
+        Bank bank = getBank(bankBlock);
+        return bank.getXp();
     }
-    
+
     /**
      * Deducts an amount from a blocks tied bank
      * @param bankBlock
@@ -132,13 +132,13 @@ public class Bank {
      * @return the new amount the bank is holding
      */
     public static int deductFromBankBlock(Block bankBlock, int amount) {
-    	Bank bank = getBank(bankBlock);
-    	bank.deduct(amount);
-    	XPInTheJar.instance.getDatabase().save(bank);
-    	
-    	return bank.getXp();
+        Bank bank = getBank(bankBlock);
+        bank.deduct(amount);
+        XPInTheJar.instance.getDatabase().save(bank);
+
+        return bank.getXp();
     }
-    
+
     /**
      * Adds an amount to a blocks tied bank
      * @param bankBlock
@@ -146,13 +146,13 @@ public class Bank {
      * @return - the new amount the bank is holding
      */
     public static int addToBankBlock(Block bankBlock, int amount) {
-    	Bank bank = getBank(bankBlock);
-    	bank.add(amount);
-    	XPInTheJar.instance.getDatabase().save(bank);
-    	
-    	return bank.getXp();
+        Bank bank = getBank(bankBlock);
+        bank.add(amount);
+        XPInTheJar.instance.getDatabase().save(bank);
+
+        return bank.getXp();
     }
-    
+
     /**
      * Gets a bank tied to a block
      * Always returns a bank, even if a new blank one
@@ -160,9 +160,9 @@ public class Bank {
      * @return
      */
     public static Bank getBank(Block bankBlock) {
-    	return getBank(bankBlock, true);
+        return getBank(bankBlock, true);
     }
-    
+
     /**
      * Gets a tied bank to a block.
      * @param bankBlock
@@ -178,14 +178,14 @@ public class Bank {
                 .ieq("worldName", bankBlock.getWorld().getName())
                     .findUnique();
         if (bank == null) {
-        	if (createIfNone == true) {
-	            bank = new Bank();
-	            bank.setX(bankBlock.getX());
-	            bank.setY(bankBlock.getY());
-	            bank.setZ(bankBlock.getZ());
-	            bank.setWorldName(bankBlock.getWorld().getName());
-	            bank.setXp(0);
-        	}
+            if (createIfNone == true) {
+                bank = new Bank();
+                bank.setX(bankBlock.getX());
+                bank.setY(bankBlock.getY());
+                bank.setZ(bankBlock.getZ());
+                bank.setWorldName(bankBlock.getWorld().getName());
+                bank.setXp(0);
+            }
         }
         return bank;
     }
