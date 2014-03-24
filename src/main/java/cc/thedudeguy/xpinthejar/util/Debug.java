@@ -32,7 +32,7 @@ public class Debug {
         for (Object debugText : debugTexts) {
             allText.append(debugText.toString());
         }
-        debug(player, allText);
+        debug(player, allText.toString());
     }
 
 }
