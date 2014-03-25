@@ -26,6 +26,11 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>comphenix-rep</id>
+            <name>Comphenix Repository</name>
+            <url>http://repo.comphenix.net/content/groups/public</url>
+        </repository>
     </repositories>
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -51,6 +56,12 @@
             <groupId>org.spoutcraft</groupId>
             <artifactId>spoutcraftplugin</artifactId>
             <version>1.6.4-R2.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
