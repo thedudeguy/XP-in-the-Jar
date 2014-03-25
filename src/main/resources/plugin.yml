@@ -5,7 +5,7 @@ description: Musha ring dum-a do dum-a da. There's XP in the jar-o. Store XP in 
 website: http://dev.bukkit.org/server-mods/xp-jar/
 author: Chris Churchwell (thedudeguy)
 database: true
-softdepend: [Spout]
+softdepend: [Spout,ProtocolLib]
 commands:
   xpinthejar:
     description: Main Command
