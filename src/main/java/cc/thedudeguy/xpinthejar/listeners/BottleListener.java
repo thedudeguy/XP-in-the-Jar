@@ -1,6 +1,9 @@
 package cc.thedudeguy.xpinthejar.listeners;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -11,6 +14,12 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 
 import cc.thedudeguy.xpinthejar.XPInTheJar;
 import cc.thedudeguy.xpinthejar.util.Debug;
+
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.injector.PacketConstructor;
 
 public class BottleListener implements Listener {
 
@@ -77,6 +86,11 @@ public class BottleListener implements Listener {
         } else {
             event.getPlayer().sendMessage("Collected " + event.getAmount() + " xp for a total of " + XPInTheJar.getXpStored(item));
         }
+
+        // play arm swing animation using protocol lib
+        if (XPInTheJar.instance.protocolLibEnabled) {
+            animatePlayerArm(event.getPlayer());
+        }
         event.setAmount(0);
     }
 
@@ -132,6 +146,21 @@ public class BottleListener implements Listener {
             event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
         } else {
             event.getPlayer().setItemInHand(new ItemStack(Material.GLASS_BOTTLE));
+        }
+    }
+
+    public void animatePlayerArm(Player player) {
+
+        Debug.debug("playing arm swing animation");
+
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        PacketConstructor animateConstruct = protocolManager.createPacketConstructor(PacketType.Play.Client.ARM_ANIMATION, player, 1);
+        PacketContainer animatePacket = animateConstruct.createPacket(player, 1);
+        try {
+            protocolManager.sendServerPacket(player, animatePacket);
+        } catch (InvocationTargetException e) {
+            Debug.debug("Error sending arm animation packet.");
+            //e.printStackTrace();
         }
     }
 
