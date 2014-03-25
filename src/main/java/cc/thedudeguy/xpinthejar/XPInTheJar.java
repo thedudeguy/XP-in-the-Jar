@@ -141,8 +141,13 @@ public class XPInTheJar extends JavaPlugin {
 
         //check for ProtocolLib
         if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-            XPInTheJar.logger.log(Level.INFO, "ProtocolLib present. Enabling ProtocolLib features.");
-            protocolLibEnabled = true;
+            if(getConfig().getBoolean("enableProtocolLib")) {
+                XPInTheJar.logger.log(Level.INFO, "ProtocolLib present. Enabling ProtocolLib features.");
+                protocolLibEnabled = true;
+            } else {
+                XPInTheJar.logger.log(Level.INFO, "Disabling ProtocolLib features even though ProtocolLib is present.");
+            }
+
         }
 
         getLogger().log(Level.INFO, "Enabled.");

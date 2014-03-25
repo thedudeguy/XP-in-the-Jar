@@ -1,4 +1,5 @@
 enableSpout: true
+enableProtocolLib: true
 enableExpBank: true
 enableXPBottles: true
 bottleRequireCrouch: true
