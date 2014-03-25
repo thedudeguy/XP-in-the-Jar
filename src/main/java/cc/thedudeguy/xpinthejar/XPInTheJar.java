@@ -115,8 +115,9 @@ public class XPInTheJar extends JavaPlugin {
         instance = this;
         logger = getLogger();
 
-        //copy the config
-        saveDefaultConfig();
+        //copy the config and load missing entries
+        this.getConfig().options().copyDefaults(true);
+        this.saveConfig();
 
         //ResourceManager.preLoginCache();
         setupDatabase();
