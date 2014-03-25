@@ -41,6 +41,7 @@ public class XPInTheJar extends JavaPlugin {
     public static String xpBottleName = ChatColor.AQUA + "XP Bottle";
 
     public boolean spoutEnabled = false;
+    public boolean protocolLibEnabled = false;
 
     /**
      * Checks if an item is an EXP Bottle.
@@ -136,6 +137,12 @@ public class XPInTheJar extends JavaPlugin {
             } else {
                 XPInTheJar.logger.log(Level.INFO, "Disabling Spout features even though Spout is present.");
             }
+        }
+
+        //check for ProtocolLib
+        if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+            XPInTheJar.logger.log(Level.INFO, "ProtocolLib present. Enabling ProtocolLib features.");
+            protocolLibEnabled = true;
         }
 
         getLogger().log(Level.INFO, "Enabled.");
