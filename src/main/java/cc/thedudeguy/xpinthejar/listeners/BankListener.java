@@ -74,8 +74,11 @@ public class BankListener implements Listener {
     }
 
     private void processCauldronInteraction(PlayerInteractEvent event) {
-
         Player player = event.getPlayer();
+
+        if(!player.hasPermission("xpjar.bank.deposit")) {
+            return;
+        }
 
         //get a connected bank.
         Block bankBlock = getConnectedBankBlock(event.getClickedBlock());
@@ -84,7 +87,9 @@ public class BankListener implements Listener {
         }
 
         //are we depositing from a bottle?
-        if(XPInTheJar.isItemXPBottle(player.getItemInHand()) && XPInTheJar.getXpStored(player.getItemInHand()) > 0) {
+        if(XPInTheJar.isItemXPBottle(player.getItemInHand())
+                && XPInTheJar.getXpStored(player.getItemInHand()) > 0
+                && player.hasPermission("xpjar.bank.depositeBottle")) {
 
             ItemStack bottle = player.getItemInHand();
             int toDeposit = XPInTheJar.getXpStored(bottle);
@@ -151,10 +156,13 @@ public class BankListener implements Listener {
     }
 
     private void processDiamondBlockInteraction(PlayerInteractEvent event) {
-
-        Block bankBlock = event.getClickedBlock();
         Player player = event.getPlayer();
 
+        if(!player.hasPermission("xpjar.bank.withdraw")) {
+            return;
+        }
+
+        Block bankBlock = event.getClickedBlock();
         int balance = Bank.getBankBalance(bankBlock);
 
         if (balance < 1) {

@@ -30,8 +30,13 @@ public class BottleListener implements Listener {
      */
     @EventHandler
     public void onBottleExp(PlayerExpChangeEvent event) {
-        Debug.debug(event.getPlayer(), "Xp Pickup");
-        Debug.debug(event.getPlayer(), "Amount: ", event.getAmount());
+        Player player = event.getPlayer();
+        if(!player.hasPermission("xpjar.bottle.collect")) {
+            return;
+        }
+
+        Debug.debug(player, "Xp Pickup");
+        Debug.debug(player, "Amount: ", event.getAmount());
 
         // orb must have positive xp value
         // might not be necessary but a failsafe
@@ -39,11 +44,11 @@ public class BottleListener implements Listener {
             return;
         }
 
-        if (XPInTheJar.instance.getConfig().getBoolean("bottleRequireCrouch") && !event.getPlayer().isSneaking()) {
+        if (XPInTheJar.instance.getConfig().getBoolean("bottleRequireCrouch") && !player.isSneaking()) {
             return;
         }
 
-        ItemStack item = event.getPlayer().getItemInHand();
+        ItemStack item = player.getItemInHand();
 
         //only glass bottle and potions
         if (!item.getType().equals(Material.GLASS_BOTTLE) && !item.getType().equals(Material.POTION)) {
@@ -51,7 +56,7 @@ public class BottleListener implements Listener {
         }
 
         if (item.getAmount() > 1) {
-            event.getPlayer().sendMessage("Your holding too many bottles to collect XP, try holding just one.");
+            player.sendMessage("Your holding too many bottles to collect XP, try holding just one.");
             return;
         }
 
@@ -69,15 +74,15 @@ public class BottleListener implements Listener {
             potionMeta.setDisplayName(XPInTheJar.xpBottleName);
             item.setItemMeta(potionMeta);
             XPInTheJar.setXpStored(item, event.getAmount());
-            event.getPlayer().setItemInHand(item);
+            player.setItemInHand(item);
         } else {
             XPInTheJar.setXpStored(item, XPInTheJar.getXpStored(item) + event.getAmount());
         }
 
         if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-            ((SpoutPlayer)event.getPlayer()).sendNotification(event.getAmount() + "xp Collected", XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
+            ((SpoutPlayer)player).sendNotification(event.getAmount() + "xp Collected", XPInTheJar.getXpStored(item) + "xp", Material.GLASS_BOTTLE);
         } else {
-            event.getPlayer().sendMessage("Collected " + event.getAmount() + " xp for a total of " + XPInTheJar.getXpStored(item));
+            player.sendMessage("Collected " + event.getAmount() + " xp for a total of " + XPInTheJar.getXpStored(item));
         }
 
         // play arm swing animation using protocol lib
@@ -94,20 +99,17 @@ public class BottleListener implements Listener {
     @EventHandler
     public void onDrinkBottle(PlayerItemConsumeEvent event) {
         //e.getPlayer().sendMessage("Consumed!");
+        Player player = event.getPlayer();
+
+        if(!player.hasPermission("xpjar.bottle.use")) {
+            return;
+        }
+
         ItemStack item = event.getItem();
 
         //must be xp bottle - water potion
-        if (!item.getType().equals(Material.POTION)) {
-            return;
-        }
-        if (item.getDurability() > 0) {
-            return;
-        }
-        // only xp bottle. (Named water potion)
-        if (!item.getItemMeta().hasDisplayName()) {
-            return;
-        }
-        if (!item.getItemMeta().getDisplayName().equals(XPInTheJar.xpBottleName)) {
+        if(!XPInTheJar.isItemXPBottle(item)) {
+            // TODO Move the "only 1 in stack (failsafe?)" check here to send a message to the player
             return;
         }
 
@@ -118,27 +120,27 @@ public class BottleListener implements Listener {
 
         //only 1 in stack (failsafe?)
         if (item.getAmount() != 1) {
-            event.getPlayer().sendMessage("You are holding too many XP Bottles, try holding just one");
+            player.sendMessage("You are holding too many XP Bottles, try holding just one");
             return;
         }
 
         int amount = XPInTheJar.getXpStored(item);
         //omnomnom
-        event.getPlayer().giveExp(amount);
+        player.giveExp(amount);
 
         //cancel original event
         event.setCancelled(true);
 
         if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-            ((SpoutPlayer) event.getPlayer()).sendNotification( "Exp Bottle Emptied", String.valueOf(amount) + "xp", Material.GLASS_BOTTLE);
+            ((SpoutPlayer) player).sendNotification( "Exp Bottle Emptied", String.valueOf(amount) + "xp", Material.GLASS_BOTTLE);
         } else {
-            event.getPlayer().sendMessage(String.valueOf(amount) + "xp emptied into your gut-hole");
+            player.sendMessage(String.valueOf(amount) + "xp emptied into your gut-hole");
         }
 
         if (XPInTheJar.instance.getConfig().getBoolean("consumeBottleOnUse")) {
-            event.getPlayer().setItemInHand(new ItemStack(Material.AIR));
+            player.setItemInHand(new ItemStack(Material.AIR));
         } else {
-            event.getPlayer().setItemInHand(new ItemStack(Material.GLASS_BOTTLE));
+            player.setItemInHand(new ItemStack(Material.GLASS_BOTTLE));
         }
     }
 
