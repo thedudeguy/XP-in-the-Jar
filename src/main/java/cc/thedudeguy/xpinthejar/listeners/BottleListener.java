@@ -50,23 +50,16 @@ public class BottleListener implements Listener {
             return;
         }
 
-        //only water potion if potion
-        if (item.getType().equals(Material.POTION)) {
-            if (item.getDurability() > 0) {
-                return;
-            }
-            // only xp bottle. (Named water potion)
-            if (!item.getItemMeta().hasDisplayName()) {
-                return;
-            }
-            if (!item.getItemMeta().getDisplayName().equals(XPInTheJar.xpBottleName)) {
-                return;
-            }
-        }
-
         if (item.getAmount() > 1) {
             event.getPlayer().sendMessage("Your holding too many bottles to collect XP, try holding just one.");
             return;
+        }
+
+        //only water potion if potion
+        if (item.getType().equals(Material.POTION)) {
+            if(!XPInTheJar.isItemXPBottle(item)) {
+                return;
+            }
         }
 
         // convert glass bottle to water potion. and/or add xp amount to meta
