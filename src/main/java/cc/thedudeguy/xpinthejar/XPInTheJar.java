@@ -76,7 +76,7 @@ public class XPInTheJar extends JavaPlugin {
     }
 
     public static int getXpStored(ItemStack item) {
-        PotionMeta meta = (PotionMeta)item.getItemMeta();
+        PotionMeta meta = (PotionMeta) item.getItemMeta();
         List<String> lore;
         if(meta.hasLore()) {
             lore = meta.getLore();
@@ -130,6 +130,9 @@ public class XPInTheJar extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new BottleListener(), this);
         }
 
+        // Register CommandHandler
+        getCommand("xpinthejar").setExecutor(new CommandHandler());
+
         //check for spout
         if(Bukkit.getPluginManager().isPluginEnabled("Spout")) {
             if(getConfig().getBoolean("enableSpout")) {
@@ -154,8 +157,7 @@ public class XPInTheJar extends JavaPlugin {
         getLogger().log(Level.INFO, "Enabled.");
     }
 
-    public void onDisable()
-    {
+    public void onDisable() {
         getLogger().log(Level.INFO, "Disabled.");
     }
 

@@ -1,5 +1,6 @@
 package cc.thedudeguy.xpinthejar.listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,11 +21,10 @@ import cc.thedudeguy.xpinthejar.util.Debug;
 public class BankListener implements Listener {
 
     /**
-     * Handle returning the xp in the bank block to the user who broke the block, so it is not lost forevor
+     * Handle returning the xp in the bank block to the user who broke the block, so it is not lost forever
      *
      * @param event
      */
-
     @EventHandler
     public void onBlockDestoy(BlockBreakEvent event) {
         if (!event.getBlock().getType().equals(Material.DIAMOND_BLOCK)) {
@@ -39,6 +39,16 @@ public class BankListener implements Listener {
             return;
         }
 
+        if(!player.hasPermission("xpjar.bank.destroy")) {
+            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
+                ((SpoutPlayer)player).sendNotification("Permission", "You don't have the permission to destroy a bank", Material.GLASS_BOTTLE);
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have the permission to destroy a bank");
+            }
+            event.setCancelled(true);
+            return;
+        }
+
         int balance = Bank.getBankBalance(bankBlock);
 
         if (balance <= 0) {
@@ -46,7 +56,7 @@ public class BankListener implements Listener {
         } else {
             player.giveExp(balance);
             if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)player).sendNotification( "Exp Bank Destroyed", "Retrieved " + String.valueOf(balance) + "xp", Material.GLASS_BOTTLE);
+                ((SpoutPlayer)player).sendNotification("Exp Bank Destroyed", "Retrieved " + String.valueOf(balance) + "xp", Material.GLASS_BOTTLE);
             } else {
                 player.sendMessage("You recovered " + String.valueOf(balance) + " Exp from the destroyed bank");
             }
@@ -74,8 +84,11 @@ public class BankListener implements Listener {
     }
 
     private void processCauldronInteraction(PlayerInteractEvent event) {
-
         Player player = event.getPlayer();
+
+        if(!player.hasPermission("xpjar.bank.deposit")) {
+            return;
+        }
 
         //get a connected bank.
         Block bankBlock = getConnectedBankBlock(event.getClickedBlock());
@@ -84,7 +97,9 @@ public class BankListener implements Listener {
         }
 
         //are we depositing from a bottle?
-        if(XPInTheJar.isItemXPBottle(player.getItemInHand()) && XPInTheJar.getXpStored(player.getItemInHand()) > 0) {
+        if(XPInTheJar.isItemXPBottle(player.getItemInHand())
+                && XPInTheJar.getXpStored(player.getItemInHand()) > 0
+                && player.hasPermission("xpjar.bank.depositeBottle")) {
 
             ItemStack bottle = player.getItemInHand();
             int toDeposit = XPInTheJar.getXpStored(bottle);
@@ -114,6 +129,9 @@ public class BankListener implements Listener {
         if (player.getLevel() <= 0 && player.getExp() <= 0) {
             return;
         }
+
+        // Player don't use / place their block if they are holding one while depositing xp
+        event.setCancelled(true);
 
         //partial level deposit
         if (player.getExp() > 0) {
@@ -151,16 +169,22 @@ public class BankListener implements Listener {
     }
 
     private void processDiamondBlockInteraction(PlayerInteractEvent event) {
-
-        Block bankBlock = event.getClickedBlock();
         Player player = event.getPlayer();
 
+        if(!player.hasPermission("xpjar.bank.withdraw")) {
+            return;
+        }
+
+        Block bankBlock = event.getClickedBlock();
         int balance = Bank.getBankBalance(bankBlock);
 
         if (balance < 1) {
             player.sendMessage("This bank is empty");
             return;
         }
+
+        // Player don't use / place their block if they are holding one while depositing xp
+        event.setCancelled(true);
 
         // we will set the withdrawel to be what is required for the player to level up.
         int withdrawel;
