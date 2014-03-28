@@ -1,5 +1,6 @@
 package cc.thedudeguy.xpinthejar.listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,11 +21,10 @@ import cc.thedudeguy.xpinthejar.util.Debug;
 public class BankListener implements Listener {
 
     /**
-     * Handle returning the xp in the bank block to the user who broke the block, so it is not lost forevor
+     * Handle returning the xp in the bank block to the user who broke the block, so it is not lost forever
      *
      * @param event
      */
-
     @EventHandler
     public void onBlockDestoy(BlockBreakEvent event) {
         if (!event.getBlock().getType().equals(Material.DIAMOND_BLOCK)) {
@@ -39,6 +39,16 @@ public class BankListener implements Listener {
             return;
         }
 
+        if(!player.hasPermission("xpjar.bank.destroy")) {
+            if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
+                ((SpoutPlayer)player).sendNotification("Permission", "You don't have the permission to destroy a bank", Material.GLASS_BOTTLE);
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have the permission to destroy a bank");
+            }
+            event.setCancelled(true);
+            return;
+        }
+
         int balance = Bank.getBankBalance(bankBlock);
 
         if (balance <= 0) {
@@ -46,7 +56,7 @@ public class BankListener implements Listener {
         } else {
             player.giveExp(balance);
             if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)event.getPlayer()).isSpoutCraftEnabled()) {
-                ((SpoutPlayer)player).sendNotification( "Exp Bank Destroyed", "Retrieved " + String.valueOf(balance) + "xp", Material.GLASS_BOTTLE);
+                ((SpoutPlayer)player).sendNotification("Exp Bank Destroyed", "Retrieved " + String.valueOf(balance) + "xp", Material.GLASS_BOTTLE);
             } else {
                 player.sendMessage("You recovered " + String.valueOf(balance) + " Exp from the destroyed bank");
             }

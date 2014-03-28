@@ -18,6 +18,9 @@ permissions:
   xpjar.bank.withdraw:
     description: Allows a player to withdraw XP
     default: true
+  xpjar.bank.destroy:
+    description: Allows a player to destroy a bank
+    default: true
   xpjar.bank.depositeBottle:
     description: Allows a player to deposit XP into a bank from a bottle
     default: true
