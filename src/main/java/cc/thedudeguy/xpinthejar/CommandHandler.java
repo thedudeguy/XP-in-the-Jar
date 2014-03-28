@@ -12,7 +12,7 @@ public class CommandHandler implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!"xpjar".equalsIgnoreCase(command.getName())) {
+        if(!"xpjar".equalsIgnoreCase(label)) {
             return false;
         }
         if(!sender.hasPermission("xpjar.command.debug")) {
@@ -23,6 +23,7 @@ public class CommandHandler implements CommandExecutor {
             if("true".equalsIgnoreCase(args[1]) || "false".equalsIgnoreCase(args[1])) {
                 XPInTheJar.instance.getConfig().set("debug", "true".equalsIgnoreCase(args[1]));
                 XPInTheJar.instance.saveConfig();
+                sender.sendMessage("Debug " + (XPInTheJar.instance.getConfig().getBoolean("debug") ? "" : "de") + "activated");
             } else {
                 sender.sendMessage("Debug value can only be 'true' or 'false'");
             }
