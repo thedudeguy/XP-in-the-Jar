@@ -109,18 +109,11 @@ public class BottleListener implements Listener {
 
         //must be xp bottle - water potion
         if(!XPInTheJar.isItemXPBottle(item)) {
-            // TODO Move the "only 1 in stack (failsafe?)" check here to send a message to the player
             return;
         }
 
         //must have xp (failsafe?)
         if (XPInTheJar.getXpStored(item) <= 0) {
-            return;
-        }
-
-        //only 1 in stack (failsafe?)
-        if (item.getAmount() != 1) {
-            player.sendMessage("You are holding too many XP Bottles, try holding just one");
             return;
         }
 
