@@ -130,7 +130,7 @@ public class BankListener implements Listener {
             return;
         }
 
-        // Player don't user / place their block if they are holding one while depositing xp
+        // Player don't use / place their block if they are holding one while depositing xp
         event.setCancelled(true);
 
         //partial level deposit
@@ -183,7 +183,7 @@ public class BankListener implements Listener {
             return;
         }
 
-        // Player don't user / place their block if they are holding one while depositing xp
+        // Player don't use / place their block if they are holding one while depositing xp
         event.setCancelled(true);
 
         // we will set the withdrawel to be what is required for the player to level up.
