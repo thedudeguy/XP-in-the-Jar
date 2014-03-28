@@ -130,6 +130,9 @@ public class XPInTheJar extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new BottleListener(), this);
         }
 
+        // Register CommandHandler
+        getCommand("xpinthejar").setExecutor(new CommandHandler());
+
         //check for spout
         if(Bukkit.getPluginManager().isPluginEnabled("Spout")) {
             if(getConfig().getBoolean("enableSpout")) {
