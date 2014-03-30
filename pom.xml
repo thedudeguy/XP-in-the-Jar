@@ -33,7 +33,7 @@
         </repository>
     </repositories>
     <build>
-        <finalName>${project.artifactId}</finalName>
+        <finalName>XPinthe</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
