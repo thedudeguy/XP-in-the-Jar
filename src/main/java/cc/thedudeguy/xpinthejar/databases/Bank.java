@@ -95,11 +95,7 @@ public class Bank {
      * @return
      */
     public static boolean hasBank(Block bankBlock) {
-        Bank bank = getBank(bankBlock, false);
-        if (bank == null) {
-            return false;
-        }
-        return true;
+        return getBank(bankBlock, false) != null;
     }
 
     /**
@@ -108,11 +104,9 @@ public class Bank {
      */
     public static void destroyBank(Block bankBlock) {
         Bank bank = getBank(bankBlock, false);
-        if (bank == null) {
-            //nothing to do.
-            return;
+        if(bank != null) {
+            XPInTheJar.instance.getDatabase().delete(bank);
         }
-        XPInTheJar.instance.getDatabase().delete(bank);
     }
 
     /**
@@ -121,8 +115,7 @@ public class Bank {
      * @return
      */
     public static int getBankBalance(Block bankBlock) {
-        Bank bank = getBank(bankBlock);
-        return bank.getXp();
+        return getBank(bankBlock).getXp();
     }
 
     /**
@@ -178,7 +171,7 @@ public class Bank {
                 .ieq("worldName", bankBlock.getWorld().getName())
                     .findUnique();
         if (bank == null) {
-            if (createIfNone == true) {
+            if (createIfNone) {
                 bank = new Bank();
                 bank.setX(bankBlock.getX());
                 bank.setY(bankBlock.getY());
