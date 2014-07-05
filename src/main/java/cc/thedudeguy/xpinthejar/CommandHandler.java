@@ -12,7 +12,7 @@ public class CommandHandler implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!"xpjar".equalsIgnoreCase(label)) {
+        if(!command.getName().equalsIgnoreCase("xpinthejar")) {
             return false;
         }
         if(!sender.hasPermission("xpjar.command.debug")) {
