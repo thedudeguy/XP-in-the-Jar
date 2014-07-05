@@ -205,15 +205,15 @@ public class BankListener implements Listener {
     }
 
 
-    private void updateSigns(Block bankBlock, Object balance) {
+    private void updateSigns(Block bankBlock, String balance) {
         BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
         for(BlockFace bf : blockFaces) {
             Block relBlock = bankBlock.getRelative(bf);
             if (isSign(relBlock.getType())) {
                 Sign sign = (Sign) relBlock.getState();
                 sign.setLine(0, "");
-                sign.setLine(1, "XP Bank");
-                sign.setLine(2, balance.toString());
+                sign.setLine(1, ChatColor.BLUE + "XP Bank");
+                sign.setLine(2, ChatColor.DARK_GRAY + balance);
                 sign.setLine(3, "");
                 sign.update(true);
             }
@@ -256,7 +256,7 @@ public class BankListener implements Listener {
     private void depositExp(Block bankBlock, int amount) {
         int balance = Bank.addToBankBlock(bankBlock, amount);
         Debug.debug("Added ", amount, " to bank to make a new balance of ", balance);
-        updateSigns(bankBlock, balance);
+        updateSigns(bankBlock, String.valueOf(balance));
     }
 
     private void withdrawExp(Player player, Block bankBlock, int amount) {
@@ -271,6 +271,6 @@ public class BankListener implements Listener {
     private void withdrawExp(Block bankBlock, int amount) {
         int balance = Bank.deductFromBankBlock(bankBlock, amount);
         Debug.debug("Withdrew ", amount, " to bank to make a new balance of ", balance);
-        updateSigns(bankBlock, balance);
+        updateSigns(bankBlock, String.valueOf(balance));
     }
 }
