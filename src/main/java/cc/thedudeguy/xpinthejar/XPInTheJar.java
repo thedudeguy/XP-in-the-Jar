@@ -68,11 +68,8 @@ public class XPInTheJar extends JavaPlugin {
         }
 
         //only 1 in stack (failsafe?)
-        if (item.getAmount() != 1) {
-            return false;
-        }
+        return item.getAmount() == 1;
 
-        return true;
     }
 
     public static int getXpStored(ItemStack item) {

@@ -141,8 +141,7 @@ public class BottleListener implements Listener {
      * Animates a players arm to swing using the ProtocolLib packet sending.
      * @param player
      */
-    public void animatePlayerArm(Player player) {
-
+    private void animatePlayerArm(Player player) {
         Debug.debug("playing arm swing animation");
 
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();

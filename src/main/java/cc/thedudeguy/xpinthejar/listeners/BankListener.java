@@ -205,12 +205,12 @@ public class BankListener implements Listener {
     }
 
 
-    public void updateSigns(Block bankBlock, Object balance) {
+    private void updateSigns(Block bankBlock, Object balance) {
         BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
         for(BlockFace bf : blockFaces) {
             Block relBlock = bankBlock.getRelative(bf);
-            if (relBlock.getType().equals(Material.SIGN) || relBlock.getType().equals(Material.SIGN_POST) || relBlock.getType().equals(Material.WALL_SIGN)) {
-                Sign sign = (Sign)relBlock.getState();
+            if (isSign(relBlock.getType())) {
+                Sign sign = (Sign) relBlock.getState();
                 sign.setLine(0, "");
                 sign.setLine(1, "XP Bank");
                 sign.setLine(2, balance.toString());
@@ -220,8 +220,11 @@ public class BankListener implements Listener {
         }
     }
 
+    private boolean isSign(Material material) {
+        return material == Material.SIGN || material == Material.SIGN_POST || material == Material.WALL_SIGN;
+    }
 
-    public Block getConnectedBankBlock(Block bankInputBlock) {
+    private Block getConnectedBankBlock(Block bankInputBlock) {
         if (bankInputBlock.getRelative(BlockFace.UP).getType().equals(Material.DIAMOND_BLOCK)) {
             return bankInputBlock.getRelative(BlockFace.UP);
         } else if (bankInputBlock.getRelative(BlockFace.DOWN).getType().equals(Material.DIAMOND_BLOCK)) {
@@ -238,8 +241,7 @@ public class BankListener implements Listener {
         return null;
     }
 
-    public void depositExp(Player player, Block bankBlock, int amount) {
-
+    private void depositExp(Player player, Block bankBlock, int amount) {
         depositExp(bankBlock, amount);
 
         if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)player).isSpoutCraftEnabled()) {
@@ -251,13 +253,13 @@ public class BankListener implements Listener {
         //TODO: Play cool sound
     }
 
-    public void depositExp(Block bankBlock, int amount) {
+    private void depositExp(Block bankBlock, int amount) {
         int balance = Bank.addToBankBlock(bankBlock, amount);
         Debug.debug("Added ", amount, " to bank to make a new balance of ", balance);
         updateSigns(bankBlock, balance);
     }
 
-    public void withdrawExp(Player player, Block bankBlock, int amount) {
+    private void withdrawExp(Player player, Block bankBlock, int amount) {
         withdrawExp(bankBlock, amount);
         if(XPInTheJar.instance.spoutEnabled && ((SpoutPlayer)player).isSpoutCraftEnabled()) {
             ((SpoutPlayer)player).sendNotification( "Exp Withdrawn", amount + "xp", Material.GLASS_BOTTLE);
@@ -266,7 +268,7 @@ public class BankListener implements Listener {
         }
     }
 
-    public void withdrawExp(Block bankBlock, int amount) {
+    private void withdrawExp(Block bankBlock, int amount) {
         int balance = Bank.deductFromBankBlock(bankBlock, amount);
         Debug.debug("Withdrew ", amount, " to bank to make a new balance of ", balance);
         updateSigns(bankBlock, balance);
