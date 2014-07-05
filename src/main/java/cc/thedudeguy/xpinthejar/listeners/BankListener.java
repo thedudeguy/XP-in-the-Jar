@@ -18,6 +18,8 @@ import cc.thedudeguy.xpinthejar.XPInTheJar;
 import cc.thedudeguy.xpinthejar.databases.Bank;
 import cc.thedudeguy.xpinthejar.util.Debug;
 
+import java.util.EnumSet;
+
 public class BankListener implements Listener {
 
     /**
@@ -204,7 +206,6 @@ public class BankListener implements Listener {
         withdrawExp(player, bankBlock, withdrawel);
     }
 
-
     private void updateSigns(Block bankBlock, String balance) {
         BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
         for(BlockFace bf : blockFaces) {
@@ -225,18 +226,10 @@ public class BankListener implements Listener {
     }
 
     private Block getConnectedBankBlock(Block bankInputBlock) {
-        if (bankInputBlock.getRelative(BlockFace.UP).getType().equals(Material.DIAMOND_BLOCK)) {
-            return bankInputBlock.getRelative(BlockFace.UP);
-        } else if (bankInputBlock.getRelative(BlockFace.DOWN).getType().equals(Material.DIAMOND_BLOCK)) {
-            return bankInputBlock.getRelative(BlockFace.DOWN);
-        } else if (bankInputBlock.getRelative(BlockFace.EAST).getType().equals(Material.DIAMOND_BLOCK)) {
-            return bankInputBlock.getRelative(BlockFace.EAST);
-        } else if (bankInputBlock.getRelative(BlockFace.WEST).getType().equals(Material.DIAMOND_BLOCK)) {
-            return bankInputBlock.getRelative(BlockFace.WEST);
-        } else if (bankInputBlock.getRelative(BlockFace.NORTH).getType().equals(Material.DIAMOND_BLOCK)) {
-            return bankInputBlock.getRelative(BlockFace.NORTH);
-        } else if (bankInputBlock.getRelative(BlockFace.SOUTH).getType().equals(Material.DIAMOND_BLOCK)) {
-            return bankInputBlock.getRelative(BlockFace.SOUTH);
+        for(BlockFace blockFace : EnumSet.range(BlockFace.NORTH, BlockFace.DOWN)) {
+            if(bankInputBlock.getRelative(blockFace).getType() == Material.DIAMOND_BLOCK) {
+                return bankInputBlock.getRelative(blockFace);
+            }
         }
         return null;
     }
