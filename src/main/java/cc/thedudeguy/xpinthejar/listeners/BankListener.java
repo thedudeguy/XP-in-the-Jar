@@ -18,9 +18,11 @@ import cc.thedudeguy.xpinthejar.XPInTheJar;
 import cc.thedudeguy.xpinthejar.databases.Bank;
 import cc.thedudeguy.xpinthejar.util.Debug;
 
-import java.util.EnumSet;
-
 public class BankListener implements Listener {
+
+    private static final BlockFace[] BLOCK_FACE_ARRAY = new BlockFace[] {
+        BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN
+    };
 
     /**
      * Handle returning the xp in the bank block to the user who broke the block, so it is not lost forever
@@ -207,9 +209,8 @@ public class BankListener implements Listener {
     }
 
     private void updateSigns(Block bankBlock, String balance) {
-        BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH};
-        for(BlockFace bf : blockFaces) {
-            Block relBlock = bankBlock.getRelative(bf);
+        for(BlockFace blockFace : BLOCK_FACE_ARRAY) {
+            Block relBlock = bankBlock.getRelative(blockFace);
             if (isSign(relBlock.getType())) {
                 Sign sign = (Sign) relBlock.getState();
                 sign.setLine(0, "");
@@ -226,7 +227,7 @@ public class BankListener implements Listener {
     }
 
     private Block getConnectedBankBlock(Block bankInputBlock) {
-        for(BlockFace blockFace : EnumSet.range(BlockFace.NORTH, BlockFace.DOWN)) {
+        for(BlockFace blockFace : BLOCK_FACE_ARRAY) {
             if(bankInputBlock.getRelative(blockFace).getType() == Material.DIAMOND_BLOCK) {
                 return bankInputBlock.getRelative(blockFace);
             }
